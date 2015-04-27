@@ -20,25 +20,25 @@ http://139.18.2.164:4441
 word2vec/distance
 
 ### parameter (GET method)
-Parameter 'a' with word and the api key 'apikey.
+Parameter 'a' with word and the api key 'apikey'.
 
 ### example
 http://139.18.2.164:4441/word2vec/distance?a=cat&apikey=your_api_key
 
 ### response
 if word is known
-```javascript
+```JSON
 {
-feline: 0.732623427803972,
-kitten: 0.7464984522340501,
-cats: 0.8099379097014889,
-puppy: 0.7075453811739294,
-beagle: 0.7150584059888843,
-cat: 1.0000000409335996,
-felines: 0.6755931328009979,
-pup: 0.6934290769272593,
-dog: 0.7609457255671259,
-pet: 0.6891531532649253
+  "feline": 0.732623427803972,
+  "kitten": 0.7464984522340501,
+  "cats": 0.8099379097014889,
+  "puppy": 0.7075453811739294,
+  "beagle": 0.7150584059888843,
+  "cat": 1.0000000409335996,
+  "felines": 0.6755931328009979,
+  "pup": 0.6934290769272593,
+  "dog": 0.7609457255671259,
+  "pet": 0.6891531532649253
 }
 ```
 
@@ -50,7 +50,7 @@ Parameter 'a' and 'b' with the words to compare and the api key 'apikey.
 
 ### response
 if words are known
-```javascript
+```JSON
 {
   "a" : {
     "word": "String of the given word (a paramter)",
@@ -90,11 +90,11 @@ http://139.18.2.164:4441/word2vec/similarity?a=wed&b=marriage&apikey=your_api_ke
 word2vec/vector
 
 ### parameter (GET method)
-Parameter 'a' and 'apikey' with the api key (if you don't have an api key, ask the autor for one).
+Parameter 'a' and 'apikey' with the api key.
 
 ### response
 if words are known
-```javascript
+```JSON
 {
   "a" : {
     "word": "String of the given word (a paramter)",
@@ -103,6 +103,3 @@ if words are known
 }
 ```
 if the word is unknown, the value of this word is empty and the property 'vec' is not set.
-
-
-
