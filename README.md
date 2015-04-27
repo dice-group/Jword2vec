@@ -50,7 +50,7 @@ Parameter 'a' and 'b' with the words to compare and the api key 'apikey.
 
 ### response
 if words are known
-```JSON
+```javascript
 {
   "a" : {
     "word": "String of the given word (a paramter)",
@@ -94,7 +94,7 @@ Parameter 'a' and 'apikey' with the api key.
 
 ### response
 if words are known
-```JSON
+```javascript
 {
   "a" : {
     "word": "String of the given word (a paramter)",
