@@ -1,4 +1,4 @@
-package org.aksw.word2vec;
+package org.aksw.word2vecrestful.word2vec;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,18 +8,36 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ModelLoader {
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 
-    public static Model loadModel(File file) {
+/**
+ * 
+ * @author MichaelRoeder
+ *
+ */
+public class Word2VecModelLoader {
+
+    public static Logger LOG = LogManager.getLogger(Word2VecModelLoader.class);
+
+    /**
+     * 
+     * @param file
+     * @return
+     */
+    public static Word2VecModel loadModel(File file) {
         FileInputStream fin = null;
         String word;
         try {
+            // reads file header
             fin = new FileInputStream(file);
             word = readWord(fin);
             int words = Integer.parseInt(word);
             word = readWord(fin);
             int vectorSize = Integer.parseInt(word);
-            System.out.println("Expecting " + words + " words with " + vectorSize + " values per vector.");
+            LOG.info("Expecting " + words + " words with " + vectorSize + " values per vector.");
+
+            // reads file data
             float vector[];
             Map<String, float[]> word2Vector = new HashMap<String, float[]>();
             for (int w = 0; w < words; ++w) {
@@ -27,15 +45,16 @@ public class ModelLoader {
                 vector = readVector(fin, vectorSize);
                 word2Vector.put(word, vector);
             }
-            return new Model(word2Vector, vectorSize);
+            return new Word2VecModel(word2Vector, vectorSize);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOG.error(e.getLocalizedMessage(), e);
             return null;
         } finally {
             if (fin != null) {
                 try {
                     fin.close();
                 } catch (IOException e) {
+                    LOG.error(e.getLocalizedMessage(), e);
                 }
             }
         }
@@ -63,4 +82,5 @@ public class ModelLoader {
         }
         return buffer.toString();
     }
+
 }
