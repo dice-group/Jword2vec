@@ -39,7 +39,7 @@ public class Word2VecController {
 
     protected String           apikey     = null;
     protected DatabaseExtended db         = null;
-    protected final int        N          = 10;
+    private final int          MAX        = 100;
 
     /**
      * 
@@ -70,10 +70,12 @@ public class Word2VecController {
             method = RequestMethod.GET)
     public @ResponseBody String distance(
             @RequestParam(value = "a") String a,
+            @RequestParam(value = "n") Integer n,
             @RequestParam(value = "apikey") String apikey,
             HttpServletResponse response
             )
     {
+        // check parameters
         if (!apikey.equals(this.apikey)) {
             try {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Wrong API key.");
@@ -83,27 +85,53 @@ public class Word2VecController {
             }
 
             return new JSONObject().toString();
-        } else {
-            synchronized (this) {
-                try {
-                    Map<String, Double> map = this.db.getNBest(N, a);
-                    JSONObject jo = new JSONObject();
-                    for (Entry<String, Double> entry : map.entrySet()) {
-                        jo.put(entry.getKey(), entry.getValue());
-                    }
+        }
+        if (n < 1) {
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "N has to be greater than 0.");
+                response.flushBuffer();
+            } catch (IOException e) {
+                LOG.error(e.getLocalizedMessage(), e);
+            }
+            return new JSONObject().toString();
+        }
 
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    return jo.toString();
+        if (a.trim().isEmpty()) {
+            try {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Please send a word.");
+                response.flushBuffer();
+            } catch (IOException e) {
+                LOG.error(e.getLocalizedMessage(), e);
+            }
+            return new JSONObject().toString();
+        }
+        // ----
 
-                } catch (Exception e) {
-                    try {
-                        response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
-                        response.flushBuffer();
-                    } catch (IOException ee) {
-                        LOG.error(ee.getLocalizedMessage(), e);
-                    }
-                    return new JSONObject().toString();
+        // max n
+        if (n > MAX) {
+            n = MAX;
+        }
+
+        synchronized (this) {
+            try {
+
+                Map<String, Double> map = this.db.getNBest(n, a);
+                JSONObject jo = new JSONObject();
+                for (Entry<String, Double> entry : map.entrySet()) {
+                    jo.put(entry.getKey(), entry.getValue());
                 }
+
+                response.setStatus(HttpServletResponse.SC_OK);
+                return jo.toString();
+
+            } catch (Exception e) {
+                try {
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getLocalizedMessage());
+                    response.flushBuffer();
+                } catch (IOException ee) {
+                    LOG.error(ee.getLocalizedMessage(), e);
+                }
+                return new JSONObject().toString();
             }
         }
     }

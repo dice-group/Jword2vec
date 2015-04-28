@@ -20,10 +20,10 @@ http://139.18.2.164:4441
 word2vec/distance
 
 ### parameter (GET method)
-Parameter 'a' with word and the api key 'apikey'.
+Parameter 'a' with a word, 'n' for the best n words (max 100) and the api key 'apikey'.
 
 ### example
-http://139.18.2.164:4441/word2vec/distance?a=cat&apikey=your_api_key
+http://139.18.2.164:4441/word2vec/distance?a=cat&n=10&apikey=your_api_key
 
 ### response
 if word is known
