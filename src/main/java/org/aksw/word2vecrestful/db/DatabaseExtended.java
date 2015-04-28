@@ -117,9 +117,12 @@ public class DatabaseExtended extends Database {
             PreparedStatement prep = connection.prepareStatement(sql);
             ResultSet resultSet = prep.executeQuery();
             int i = 0;
+            String input = word;
             while (resultSet.next()) {
                 b = resultSet.getBytes("normVec");
                 word = resultSet.getString("word");
+                if (word.equals(input))
+                    continue;
                 float[] comp = (b == null) ? null : (float[]) Serialize.fromByte(b);
                 if (comp != null) {
 
@@ -138,8 +141,9 @@ public class DatabaseExtended extends Database {
                             Set<String> remove = new HashSet<>();
                             for (Entry<String, Double> entry : map.entrySet()) {
                                 if (entry.getValue() == min) {
-                                    remove.add(entry.getKey()); /* could be more than one! how to handle? */
-                                    break; // remove break?
+                                    /* could be more than one! how to handle? */
+                                    remove.add(entry.getKey());
+                                    break;
                                 }
                             }
                             for (String w : remove)
@@ -154,6 +158,5 @@ public class DatabaseExtended extends Database {
             disconnect();
         }
         return map;
-
     }
 }
