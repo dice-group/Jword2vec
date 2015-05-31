@@ -6,9 +6,11 @@ A service for code.google.com/p/word2vec models.
 ### local installation
 Java 8, Maven 3
 
-Download and unzip to the 'data' folder: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit
+This step is done by the application now!
+(Download and unzip to the 'data' folder: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit)
 
 Add your own api key in 'config/cfg.properties'.
+Execute 'run.sh' to compile and start the application.
 
 ### online web service
 An api key (if you don't have an api key, ask the autor for one).
@@ -66,7 +68,7 @@ if words are known
 if one word is unknown, the value of this word is empty and the property 'vec' is not set.
 
 ### example
-http://139.18.2.164:4441/word2vec/similarity?a=wed&b=marriage&apikey=your_api_key
+http://139.18.2.164:4441/word2vec/similarity?a=marry&b=wed&apikey=your_api_key
 
 ```JSON
 {  
