@@ -43,7 +43,7 @@ public class Data {
             if (!content.isEmpty()) {
                 String start = content.substring(content.indexOf("confirm=") + "confirm=".length());
                 confirm = start.substring(0, start.indexOf("&amp;"));
-                LOG.info(confirm);
+                // LOG.info(confirm);
             }
 
             // get cookies
@@ -68,7 +68,6 @@ public class Data {
                 regCon.connect();
 
                 // download file
-                LOG.info("Downloading file (1.5G), please wait");
                 boolean done = downloadFile(regCon.getInputStream());
                 if (!done)
                     LOG.warn("Could not download " + download_url);
@@ -113,10 +112,14 @@ public class Data {
     }
 
     public static void gunzipIt() {
+        gunzipIt(filename_zip, filename);
+    }
+
+    public static void gunzipIt(String zip, String unzip) {
         byte[] buffer = new byte[1024];
         try {
-            GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(filename_zip));
-            FileOutputStream out = new FileOutputStream(filename);
+            GZIPInputStream gzis = new GZIPInputStream(new FileInputStream(zip));
+            FileOutputStream out = new FileOutputStream(unzip);
 
             int len;
             while ((len = gzis.read(buffer)) > 0) {
