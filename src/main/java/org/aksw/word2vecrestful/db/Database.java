@@ -3,6 +3,7 @@ package org.aksw.word2vecrestful.db;
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -13,7 +14,7 @@ public class Database {
 
     public static Logger    LOG          = Logger.getLogger(Database.class);
 
-    public static String    dbName       = "word2vec";
+    public static String    dbName       = "data/word2vec";
     public static String    textTable    = "google";
     public static int       queryTimeout = 30;
 
@@ -57,6 +58,25 @@ public class Database {
             } finally {
                 disconnect();
             }
+    }
+
+    /**
+     * Creates an index.
+     */
+    public void makeIndex() {
+        if (connect()) {
+            String sql = "CREATE INDEX Idx1 ON " + textTable + "(word)";
+            if (connection != null) {
+                try {
+                    PreparedStatement prep = connection.prepareStatement(sql);
+                    prep.execute();
+                    prep.close();
+                } catch (SQLException e) {
+                    LOG.error(e.getLocalizedMessage(), e);
+                }
+            }
+            disconnect();
+        }
     }
 
     /**

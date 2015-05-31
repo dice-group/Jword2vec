@@ -41,7 +41,6 @@ public class DatabaseExtended extends Database {
      */
     public DatabaseExtended() {
         createTable();
-
     }
 
     public void saveModeltoDB() throws IOException, SQLException {
