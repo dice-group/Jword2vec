@@ -29,7 +29,7 @@ public class ServiceTest {
         Application.main(new String[0]);
     }
 
-    public static String url = "http://localhost:4442/word2vec/vector?&apikey=1234&a=";
+    public static String url = "http://localhost:4441/word2vec/vector?&apikey=1234&a=";
     public static String cat = null;
     public static String dog = null;
 
