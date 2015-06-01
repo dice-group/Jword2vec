@@ -12,7 +12,7 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 public class Serialize {
 
     /** Read the object from Base64 string. */
-    public static Object fromString(String s) throws IOException, ClassNotFoundException {
+    public synchronized static Object fromString(String s) throws IOException, ClassNotFoundException {
         byte[] data = Base64Coder.decode(s);
         ByteArrayInputStream bai = new ByteArrayInputStream(data);
         ObjectInputStream ois = new ObjectInputStream(bai);
@@ -23,7 +23,7 @@ public class Serialize {
     }
 
     /** Read the object from Base64 string. */
-    public static Object fromByte(byte[] data) throws IOException, ClassNotFoundException {
+    public synchronized static Object fromByte(byte[] data) throws IOException, ClassNotFoundException {
         ByteArrayInputStream bai = new ByteArrayInputStream(data);
         ObjectInputStream ois = new ObjectInputStream(bai);
         Object o = ois.readObject();
@@ -33,7 +33,7 @@ public class Serialize {
     }
 
     /** Write the object to a Base64 string. */
-    public static String toString(Serializable o) throws IOException {
+    public synchronized static String toString(Serializable o) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(o);
@@ -43,7 +43,7 @@ public class Serialize {
     }
 
     /** Write the object to a byte array. */
-    public static byte[] toByte(Serializable o) throws IOException {
+    public synchronized static byte[] toByte(Serializable o) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(baos);
         oos.writeObject(o);

@@ -1,10 +1,6 @@
 package org.aksw.word2vecrestful.web;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -46,12 +42,8 @@ public class Word2VecController {
      */
     @PostConstruct
     public void init() {
-
         apikey = Cfg.get(CFG_APIKEY);
-        synchronized (this) {
-            db = new DatabaseExtended();
-        }
-        writeShutDownFile("close");
+        db = new DatabaseExtended();
     }
 
     /**
@@ -112,10 +104,9 @@ public class Word2VecController {
             n = MAX;
         }
 
-        synchronized (this) {
+        synchronized (db) {
             try {
-
-                Map<String, Double> map = this.db.getNBest(n, a);
+                Map<String, Double> map = db.getNBest(n, a);
                 JSONObject jo = new JSONObject();
                 for (Entry<String, Double> entry : map.entrySet()) {
                     jo.put(entry.getKey(), entry.getValue());
@@ -167,7 +158,7 @@ public class Word2VecController {
 
             return new JSONObject().toString();
         } else {
-            synchronized (this) {
+            synchronized (db) {
                 try {
                     byte[] ab = db.getVec(a);
                     byte[] bb = db.getVec(b);
@@ -233,7 +224,7 @@ public class Word2VecController {
             }
             return new JSONObject().toString();
         } else {
-            synchronized (this) {
+            synchronized (db) {
                 try {
                     byte[] ab = db.getVec(a);
                     float[] av = (ab == null) ? null : (float[]) Serialize.fromByte(ab);
@@ -264,56 +255,5 @@ public class Word2VecController {
                 }
             }
         }
-    }
-
-    /**
-     * Gives the applications process id.
-     * 
-     * @return applications process id
-     */
-    public static synchronized String getProcessId() {
-
-        final String jvmName = ManagementFactory.getRuntimeMXBean().getName();
-        final int index = jvmName.indexOf('@');
-        if (index < 1)
-            return null;
-        try {
-            return Long.toString(Long.parseLong(jvmName.substring(0, index)));
-        } catch (NumberFormatException e) {
-            return null;
-        }
-    }
-
-    /**
-     * Writes a system depended file to shut down the application with kill cmd
-     * and process id.
-     * 
-     * @return true if the file was written
-     */
-    public static synchronized boolean writeShutDownFile(String fileName) {
-
-        // get process Id
-        String id = getProcessId();
-        if (id == null)
-            return false;
-
-        String cmd = "";
-        String fileExtension = "";
-
-        cmd = "kill " + id + System.getProperty("line.separator") + "rm " + fileName + ".sh";
-        fileExtension = "sh";
-        LOG.info(fileName + "." + fileExtension);
-
-        File file = new File(fileName + "." + fileExtension);
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter(file));
-            out.write(cmd);
-            out.close();
-        } catch (Exception e) {
-            LOG.error(e.getMessage());
-        }
-        file.setExecutable(true, false);
-        file.deleteOnExit();
-        return true;
     }
 }
