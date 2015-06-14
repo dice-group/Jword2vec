@@ -1,10 +1,6 @@
 package org.aksw.word2vecrestful;
 
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Scanner;
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletionService;
 import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
@@ -24,41 +20,18 @@ public class ServiceTest {
     }
     public static Logger LOG = Logger.getLogger(ServiceTest.class);
 
+    static String        url = "http://localhost:4441/word2vec/vector?&apikey=1234&a=";
+
     // run server
     static {
         Application.main(new String[0]);
     }
 
-    public static String url = "http://localhost:4441/word2vec/vector?&apikey=1234&a=";
     public static String cat = null;
     public static String dog = null;
 
-    class Animal implements Callable<SimpleEntry<String, String>> {
-
-        String name;
-
-        public Animal(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public SimpleEntry<String, String> call() throws Exception {
-            URL myurl = new URL(url.concat(name));
-            HttpURLConnection con = (HttpURLConnection) myurl.openConnection();
-            con.connect();
-
-            String content;
-            Scanner scanner = new Scanner(con.getInputStream());
-            scanner.useDelimiter("\\A");
-            content = scanner.hasNext() ? scanner.next() : "";
-            scanner.close();
-            return new SimpleEntry<String, String>(name, content);
-        }
-    }
-
     @Test
     public void requestDogTest() {
-
         boolean allTestDone = false;
         try {
             ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -68,15 +41,14 @@ public class ServiceTest {
             final int n = 400;
             int nn = 0;
             for (int i = 0; i < n; i++) {
-                completionService.submit(new Animal("dog"));
+                completionService.submit(new ServiceCaller("dog", url));
                 nn++;
-                completionService.submit(new Animal("cat"));
+                completionService.submit(new ServiceCaller("cat", url));
                 nn++;
             }
             executorService.shutdown();
 
             for (int i = 0; i < nn; ++i) {
-
                 Future<SimpleEntry<String, String>> future = completionService.take();
                 SimpleEntry<String, String> result = future.get();
 
@@ -101,8 +73,8 @@ public class ServiceTest {
             }
             allTestDone = true;
         } catch (Exception e) {
-            Assert.assertTrue(allTestDone);
             LOG.error(e.getLocalizedMessage());
+            Assert.assertTrue(allTestDone);
         }
     }
 
