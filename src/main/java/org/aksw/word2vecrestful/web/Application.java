@@ -11,6 +11,7 @@ import org.aksw.word2vecrestful.data.Data;
 import org.aksw.word2vecrestful.db.Database;
 import org.aksw.word2vecrestful.db.DatabaseExtended;
 import org.aksw.word2vecrestful.utils.Cfg;
+import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.springframework.boot.SpringApplication;
@@ -37,32 +38,31 @@ public class Application {
     public static void main(String[] args) {
 
         if (!Database.dbExists()) {
-
-            if (!new File(Data.filename_zip).exists()) {
-                if (!new File(Data.filename).exists()) {
+            if (!new File(Word2VecFactory.model).exists()) {
+                if (!new File(Data.filename_zip).exists()) {
                     LOG.info("Downloading file (1.5G) ...");
                     Data.downloadFile();
-                }
-                if (new File(Data.filename_zip).exists()) {
-                    LOG.info("Unzip file ...");
-                    Data.gunzipIt();
+
+                    if (new File(Data.filename_zip).exists()) {
+                        LOG.info("Unzip file ...");
+                        Data.gunzipIt();
+                    }
                 }
             }
 
             DatabaseExtended databaseExtended = new DatabaseExtended();
             try {
                 LOG.info("Creating database ...");
-                databaseExtended.saveModeltoDB();
+                databaseExtended.saveModeltoDB(Word2VecFactory.get());
                 LOG.info("Making index ...");
                 databaseExtended.makeIndex();
                 databaseExtended = null;
             } catch (IOException | SQLException e) {
                 LOG.error(e.getLocalizedMessage(), e);
             }
-        } else {
-            writeShutDownFile("close");
-            context = SpringApplication.run(Application.class, args);
         }
+        writeShutDownFile("close");
+        context = SpringApplication.run(Application.class, args);
     }
 
     /**

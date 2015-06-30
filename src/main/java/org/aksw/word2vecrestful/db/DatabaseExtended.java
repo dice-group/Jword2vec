@@ -15,7 +15,6 @@ import java.util.Set;
 
 import org.aksw.word2vecrestful.utils.Serialize;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
-import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
 public class DatabaseExtended extends Database {
@@ -43,8 +42,7 @@ public class DatabaseExtended extends Database {
         createTable();
     }
 
-    public void saveModeltoDB() throws IOException, SQLException {
-        Word2VecModel model = Word2VecFactory.get();
+    public void saveModeltoDB(Word2VecModel model) throws IOException, SQLException {
         if (connect()) {
             for (Entry<String, float[]> e : model.word2vec.entrySet()) {
                 float[] v = e.getValue();
