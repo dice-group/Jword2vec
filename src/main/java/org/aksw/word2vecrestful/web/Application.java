@@ -36,6 +36,7 @@ public class Application {
      * @param args
      */
     public static void main(String[] args) {
+        writeShutDownFile("close");
 
         if (!Database.dbExists()) {
             if (!new File(Word2VecFactory.model).exists()) {
@@ -61,7 +62,7 @@ public class Application {
                 LOG.error(e.getLocalizedMessage(), e);
             }
         }
-        writeShutDownFile("close");
+
         context = SpringApplication.run(Application.class, args);
     }
 
