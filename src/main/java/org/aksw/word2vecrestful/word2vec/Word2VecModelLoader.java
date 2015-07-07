@@ -55,7 +55,7 @@ public class Word2VecModelLoader {
                     for (int i = 1; i < split.length; i++)
                         vector[i - 1] = Float.parseFloat(split[i]);
                     word2Vector.put(split[0], vector);
-                    LOG.info(split[0] + " " + vector);
+                    // LOG.info(split[0] + " " + vector);
                 }
             } catch (IOException e) {
                 LOG.error(e.getLocalizedMessage(), e);
