@@ -49,13 +49,14 @@ public class Word2VecModelLoader {
                 words = Integer.parseInt(header.split(" ")[0]);
                 vectorSize = Integer.parseInt(header.split(" ")[1]);
                 LOG.info("Expecting " + words + " words with " + vectorSize + " values per vector.");
-                float vector[] = new float[vectorSize];
+
                 for (String line; (line = br.readLine()) != null;) {
+                    float vector[] = new float[vectorSize];
                     String[] split = line.split(" ");
                     for (int i = 1; i < split.length; i++)
                         vector[i - 1] = Float.parseFloat(split[i]);
                     word2Vector.put(split[0], vector);
-                    // LOG.info(split[0] + " " + vector);
+
                 }
             } catch (IOException e) {
                 LOG.error(e.getLocalizedMessage(), e);
