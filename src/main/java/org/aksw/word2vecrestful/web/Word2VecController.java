@@ -2,8 +2,8 @@ package org.aksw.word2vecrestful.web;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.annotation.PostConstruct;
@@ -103,10 +103,7 @@ public class Word2VecController {
       }
       if (done || ((i + 1) == cw.length)) {
         final String m = currentWord.toString();
-
         final float[] addvec = db.getVec(m);
-        LOG.info(m + " " + addvec.length);
-
         vecs.add(addvec);
         done = false;
         currentWord = new StringBuffer();
@@ -114,7 +111,6 @@ public class Word2VecController {
     }
 
     // check if the amount of operators matches the vecs
-
     if ((vecs.size() > 0) && ((aopers.size() + 1) == vecs.size())) {
       String currentOperator = "";
       float[] currentVec = vecs.get(0);
@@ -129,14 +125,14 @@ public class Word2VecController {
           } else if (currentOperator.equals("-")) {
             currentVec = Word2VecMath.sub(currentVec, vectodo);
           } else {
+            // TODO: handle
             LOG.warn("Something went wrong...");
           }
         } else {
+          // TODO: handle
           LOG.error("There is a null vector");
         }
       }
-
-      // TODO: find closes word to the finel vec
 
       // max n
       if (n > MAX) {
@@ -145,9 +141,8 @@ public class Word2VecController {
       final JSONObject jo = new JSONObject();
       synchronized (db) {
         try {
-          final Map<String, Double> map = db.getNClosest(currentVec, n);
+          final LinkedHashMap<String, Double> map = db.getNClosest(currentVec, n);
           // map to json
-
           for (final Entry<String, Double> entry : map.entrySet()) {
             jo.put(entry.getKey(), entry.getValue());
           }
@@ -174,7 +169,6 @@ public class Word2VecController {
       }
       return new JSONObject().toString();
     }
-
   }
 
   /**
@@ -223,7 +217,7 @@ public class Word2VecController {
     }
     synchronized (db) {
       try {
-        final Map<String, Double> map = db.getNBest(a, n);
+        final LinkedHashMap<String, Double> map = db.getNBest(a, n);
         // map to json
         final JSONObject jo = new JSONObject();
         for (final Entry<String, Double> entry : map.entrySet()) {

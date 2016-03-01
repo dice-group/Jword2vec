@@ -23,7 +23,7 @@ public class InMemoryDB implements IDatabase {
   public LinkedHashMap<String, Double> getNClosest(final float[] vec, final int n) {
     final LinkedHashMap<String, Double> nbest = new LinkedHashMap<>();
     try {
-      Map<String, Double> map = new HashMap<>();
+      final Map<String, Double> map = new HashMap<>();
 
       for (final Entry<String, float[]> entry : model.word2vec.entrySet()) {
         final String modelWord = entry.getKey();
@@ -34,13 +34,13 @@ public class InMemoryDB implements IDatabase {
               Word2VecMath.normalize(inputVec), Word2VecMath.normalize(modelVec)));
         }
       }
-      map = MapUtil.reverseSortByValue(map);
+      final LinkedHashMap<String, Double> lmap = (LinkedHashMap) MapUtil.reverseSortByValue(map);
       // put n best to result map nbest
       int i = 0;
-      for (final Entry<String, Double> e : map.entrySet()) {
+      for (final Entry<String, Double> e : lmap.entrySet()) {
         nbest.put(e.getKey(), e.getValue());
         i++;
-        if (i > n) {
+        if (i >= n) {
           break;
         }
       }
@@ -55,7 +55,7 @@ public class InMemoryDB implements IDatabase {
   public LinkedHashMap<String, Double> getNBest(final String word, final int n) {
     final LinkedHashMap<String, Double> nbest = new LinkedHashMap<>();
     try {
-      Map<String, Double> map = new HashMap<>();
+      final Map<String, Double> map = new HashMap<>();
 
       for (final Entry<String, float[]> entry : model.word2vec.entrySet()) {
 
@@ -72,13 +72,14 @@ public class InMemoryDB implements IDatabase {
         }
       }
 
-      map = MapUtil.reverseSortByValue(map);
+      final LinkedHashMap<String, Double> lmap =
+          (LinkedHashMap<String, Double>) MapUtil.reverseSortByValue(map);
       // put n best to result map nbest
       int i = 0;
-      for (final Entry<String, Double> e : map.entrySet()) {
+      for (final Entry<String, Double> e : lmap.entrySet()) {
         nbest.put(e.getKey(), e.getValue());
         i++;
-        if (i > n) {
+        if (i >= n) {
           break;
         }
       }
