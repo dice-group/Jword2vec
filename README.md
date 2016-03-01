@@ -10,13 +10,37 @@ This step is done by the application now!
 (Download and unzip to the 'data' folder: https://drive.google.com/file/d/0B7XkCwpI5KDYNlNUTTlSS21pQmM/edit)
 
 Add your own api key in 'config/cfg.properties'.
-Execute 'run.sh' to compile and start the application.
+Execute 'build.sh' and 'run.sh' to compile and start the application.
 
 ### online web service
 An api key (if you don't have an api key, ask the autor for one).
 
-## demo URI
-http://139.18.2.164:4441
+## Path
+word2vec/operation
+
+### parameter (GET method)
+Parameter 'words' with a words and operations (e.g.: Paris-France+Italy), 'n' for the closest n words (max 100) and the api key 'apikey'.
+
+### example
+http://0.0.0.0:4441/word2vec/operation?words=Paris-France%2BItaly&n=10&apikey=1234
+
+### response
+
+```JSON
+{
+Bologna: 0.5608358700320872,
+Sicily: 0.55963849176851,
+Bologna_Italy: 0.5470059717818003,
+Berna_Milan: 0.5464028168503319,
+Italian: 0.5911273683855143,
+Milan: 0.7222141710180949,
+Rome: 0.7028311510923686,
+Italy: 0.6732642926888275,
+Palermo_Sicily: 0.5967570808931413,
+Paris: 0.6551907901555296,
+Tuscany: 0.5632813031776323
+}
+```
 
 ## Path
 word2vec/distance
@@ -25,7 +49,7 @@ word2vec/distance
 Parameter 'a' with a word, 'n' for the best n words (max 100) and the api key 'apikey'.
 
 ### example
-http://139.18.2.164:4441/word2vec/distance?a=cat&n=10&apikey=your_api_key
+http://0.0.0.0:4441/word2vec/distance?a=cat&n=10&apikey=1234
 
 ### response
 if word is known
@@ -68,7 +92,7 @@ if words are known
 if one word is unknown, the value of this word is empty and the property 'vec' is not set.
 
 ### example
-http://139.18.2.164:4441/word2vec/similarity?a=marry&b=wed&apikey=your_api_key
+http://0.0.0.0:4441/word2vec/similarity?a=marry&b=wed&apikey=1234
 
 ```JSON
 {  

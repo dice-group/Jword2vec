@@ -11,44 +11,46 @@ import org.yaml.snakeyaml.external.biz.base64Coder.Base64Coder;
 
 public class Serialize {
 
-    /** Read the object from Base64 string. */
-    public synchronized static Object fromString(String s) throws IOException, ClassNotFoundException {
-        byte[] data = Base64Coder.decode(s);
-        ByteArrayInputStream bai = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(bai);
-        Object o = ois.readObject();
-        ois.close();
-        bai.close();
-        return o;
-    }
+  /** Read the object from Base64 string. */
+  public synchronized static Object fromString(final String s)
+      throws IOException, ClassNotFoundException {
+    final byte[] data = Base64Coder.decode(s);
+    final ByteArrayInputStream bai = new ByteArrayInputStream(data);
+    final ObjectInputStream ois = new ObjectInputStream(bai);
+    final Object o = ois.readObject();
+    ois.close();
+    bai.close();
+    return o;
+  }
 
-    /** Read the object from Base64 string. */
-    public synchronized static Object fromByte(byte[] data) throws IOException, ClassNotFoundException {
-        ByteArrayInputStream bai = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(bai);
-        Object o = ois.readObject();
-        ois.close();
-        bai.close();
-        return o;
-    }
+  /** Read the object from Base64 string. */
+  public synchronized static Object fromByte(final byte[] data)
+      throws IOException, ClassNotFoundException {
+    final ByteArrayInputStream bai = new ByteArrayInputStream(data);
+    final ObjectInputStream ois = new ObjectInputStream(bai);
+    final Object o = ois.readObject();
+    ois.close();
+    bai.close();
+    return o;
+  }
 
-    /** Write the object to a Base64 string. */
-    public synchronized static String toString(Serializable o) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(o);
-        oos.close();
-        baos.close();
-        return new String(Base64Coder.encode(baos.toByteArray()));
-    }
+  /** Write the object to a Base64 string. */
+  public synchronized static String toString(final Serializable o) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ObjectOutputStream oos = new ObjectOutputStream(baos);
+    oos.writeObject(o);
+    oos.close();
+    baos.close();
+    return new String(Base64Coder.encode(baos.toByteArray()));
+  }
 
-    /** Write the object to a byte array. */
-    public synchronized static byte[] toByte(Serializable o) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(o);
-        oos.close();
-        baos.close();
-        return baos.toByteArray();
-    }
+  /** Write the object to a byte array. */
+  public synchronized static byte[] toByte(final Serializable o) throws IOException {
+    final ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    final ObjectOutputStream oos = new ObjectOutputStream(baos);
+    oos.writeObject(o);
+    oos.close();
+    baos.close();
+    return baos.toByteArray();
+  }
 }
