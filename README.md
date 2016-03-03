@@ -12,9 +12,6 @@ This step is done by the application now!
 Add your own api key in 'config/cfg.properties'.
 Execute 'build.sh' and 'run.sh' to compile and start the application.
 
-### online web service
-An api key (if you don't have an api key, ask the autor for one).
-
 ## Path
 word2vec/operation
 
