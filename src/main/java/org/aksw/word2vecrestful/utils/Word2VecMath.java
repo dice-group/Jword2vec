@@ -71,4 +71,26 @@ public class Word2VecMath {
     }
     return vectorA;
   }
+  //Adding maxval and minval methods
+  //Method for getting the maximum value
+  public static float getMax(float[] inputArray){ 
+	  float maxValue = inputArray[0]; 
+	  for(int i=1;i < inputArray.length;i++){ 
+		  if(inputArray[i] > maxValue){ 
+			  maxValue = inputArray[i]; 
+		  } 
+	  } 
+	  return maxValue; 
+  }
+
+  // Method for getting the minimum value
+  public static float getMin(float[] inputArray){ 
+	  float minValue = inputArray[0]; 
+	  for(int i=1;i<inputArray.length;i++){ 
+		  if(inputArray[i] < minValue){ 
+			  minValue = inputArray[i]; 
+		  } 
+	  } 
+	  return minValue;
+  } 
 }
