@@ -26,6 +26,9 @@ public class Word2VecModel {
     //fetch vector dimension details
     fetchVectorDimensions();
   }
+  /**
+   * Method to fetch and store range of each dimension in the model
+   */
   private void fetchVectorDimensions() {
 	  float[] dimVals;
 	  VectorDimension vectorDimension;
@@ -48,6 +51,11 @@ public class Word2VecModel {
 		  this.dimRngIndxDesc[k++] = descIt.next().getId();
 	  }
   }
+  /**
+   * Method to fetch a single closest word entry to the passed input vector
+   * @param inpvec - input vector to find closest word for
+   * @return Map of the single closest word and its vector
+   */
   public Map<String, float[]> getClosestEntry(float[] inpvec){
 	  Map<String, float[]> resMap = new HashMap<>();
 	  double minDist = -2;
@@ -67,7 +75,14 @@ public class Word2VecModel {
 	  resMap.put(minWord, minVec);
 	  return resMap;
   }
-  
+  /**
+   * Method to find the squared value of euclidean distance between two vectors if it is less
+   * than the provided minimum distance value, otherwise return -1
+   * @param arr1 - first vector
+   * @param arr2 - second vector
+   * @param minDist - minimum distance constraint
+   * @return squared euclidean distance between two vector or -1
+   */
   private double getEucDistSqr(float[] arr1, float[] arr2, double minDist) {
 	  double dist = 0;
 	  for(int i: dimRngIndxDesc) {
