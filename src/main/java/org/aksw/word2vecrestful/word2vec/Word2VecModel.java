@@ -30,11 +30,10 @@ public class Word2VecModel {
    * Method to fetch and store range of each dimension in the model
    */
   private void fetchVectorDimensions() {
-	  float[] dimVals;
+	  float[] dimVals = new float[word2vec.size()];;
 	  VectorDimension vectorDimension;
 	  //for each dimension
 	  for(int i=0;i<vectorSize;i++) {
-		  dimVals = new float[word2vec.size()];
 		  //fetch all the values
 		  int j=0;
 		  for(float[] entryVec : word2vec.values()) {
@@ -65,7 +64,7 @@ public class Word2VecModel {
 	  for(Entry<String, float[]> wordEntry : word2vec.entrySet()) {
 		  String word = wordEntry.getKey();
 		  float[] wordvec = wordEntry.getValue();
-		  tempDist = getEucDistSqr(inpvec, wordvec, minDist);
+		  tempDist = getSqEucDist(inpvec, wordvec, minDist);
 		  if(tempDist != -1) {
 			  minWord = word;
 			  minVec = wordvec;
@@ -83,7 +82,7 @@ public class Word2VecModel {
    * @param minDist - minimum distance constraint
    * @return squared euclidean distance between two vector or -1
    */
-  private double getEucDistSqr(float[] arr1, float[] arr2, double minDist) {
+  private double getSqEucDist(float[] arr1, float[] arr2, double minDist) {
 	  double dist = 0;
 	  for(int i: dimRngIndxDesc) {
 		  dist+= Math.pow(arr1[i]-arr2[i], 2);
