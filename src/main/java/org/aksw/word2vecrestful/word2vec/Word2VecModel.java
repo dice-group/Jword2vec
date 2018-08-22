@@ -1,12 +1,17 @@
 package org.aksw.word2vecrestful.word2vec;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
+import org.aksw.word2vecrestful.subset.DataSubsetProvider;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 /**
  *
@@ -64,6 +69,36 @@ public class Word2VecModel {
 	  for(Entry<String, float[]> wordEntry : word2vec.entrySet()) {
 		  String word = wordEntry.getKey();
 		  float[] wordvec = wordEntry.getValue();
+		  tempDist = getSqEucDist(inpvec, wordvec, minDist);
+		  if(tempDist != -1) {
+			  minWord = word;
+			  minVec = wordvec;
+			  minDist = tempDist;
+		  }
+	  }
+	  resMap.put(minWord, minVec);
+	  return resMap;
+  }
+  
+  /**
+   * Method to fetch a single closest word entry to the passed input vector 
+   * inside the subset of word2vec model
+   * @param inpvec - input vector to find closest word for
+   * @param subsetKey - key to identify the subset model
+   * @return Map of the single closest word and its vector
+ * @throws IOException 
+ * @throws FileNotFoundException 
+ * @throws JsonProcessingException 
+   */
+  public Map<String, float[]> getClosestEntryInSub(float[] inpvec, String subsetKey) throws JsonProcessingException, FileNotFoundException, IOException{
+	  Map<String, float[]> resMap = new HashMap<>();
+	  double minDist = -2;
+	  String minWord = null;
+	  float[] minVec = null;
+	  double tempDist;
+	  // Loop on the subset
+	  for(String word : DataSubsetProvider.fetchSubsetWords(subsetKey)) {
+		  float[] wordvec = word2vec.get(word);
 		  tempDist = getSqEucDist(inpvec, wordvec, minDist);
 		  if(tempDist != -1) {
 			  minWord = word;
