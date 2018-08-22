@@ -22,6 +22,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+/**
+ * Class to help generate and persist the subsets of a word2vec model
+ * 
+ * @author Nikit
+ *
+ */
 public class DataSubsetGenerator {
 
 	public static final JsonNodeFactory JSON_FACTORY = JsonNodeFactory.instance;
@@ -31,9 +37,19 @@ public class DataSubsetGenerator {
 	public static final String SD_LABEL = "sd";
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
-	public static final  ObjectWriter OBJ_WRITER = OBJ_MAPPER.writer(new DefaultPrettyPrinter());
-	public static void generateSubsetFiles(File subsetConfig, String outputFileDir, Map<String, float[]> word2vec, int vectorSize)
-			throws JsonProcessingException, FileNotFoundException, IOException {
+	public static final ObjectWriter OBJ_WRITER = OBJ_MAPPER.writer(new DefaultPrettyPrinter());
+	/**
+	 * Method to generate subset json files for a given configuration and word2vec model
+	 * @param subsetConfig - configuration json file
+	 * @param outputFileDir - output directory for the subset files
+	 * @param word2vec - word2vec model map
+	 * @param vectorSize - size of the vectors in model
+	 * @throws JsonProcessingException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static void generateSubsetFiles(File subsetConfig, String outputFileDir, Map<String, float[]> word2vec,
+			int vectorSize) throws JsonProcessingException, FileNotFoundException, IOException {
 		// Read file into a json
 		ObjectNode inpObj = (ObjectNode) OBJ_READER.readTree(new FileInputStream(subsetConfig));
 		ArrayNode inpDt = (ArrayNode) inpObj.get(DATA_LABEL);
@@ -63,13 +79,13 @@ public class DataSubsetGenerator {
 				float[] wordvec = wordEntry.getValue();
 				boolean isValid = true;
 				for (int i = 0; i < centroid.size(); i++) {
-					if(limitNotSet) {
+					if (limitNotSet) {
 						float centVal = centroid.get(i).floatValue();
 						float sdVal = stndrdDev.get(i).floatValue();
 						// maxlim = add sd to centroid
-						maxlim[i] = centVal + 3*sdVal;
+						maxlim[i] = centVal + 3 * sdVal;
 						// minlim = subtract sb from centroid
-						minlim[i] = centVal - 3*sdVal;
+						minlim[i] = centVal - 3 * sdVal;
 					}
 					// check if values of all the dimensions are under maxlim and minlim
 					float curVal = wordvec[i];
@@ -86,13 +102,21 @@ public class DataSubsetGenerator {
 			}
 			// Persist each json file
 			File outputJsonFile = new File(outputFileDir + "/" + key + ".json");
+			outputJsonFile.getParentFile().mkdirs();
 			OBJ_WRITER.writeValue(outputJsonFile, resObj);
 		}
 	}
-	
+	/**
+	 * Method to demonstrate example usage
+	 * @param args
+	 * @throws JsonProcessingException
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
 	public static void main(String[] args) throws JsonProcessingException, FileNotFoundException, IOException {
 		File subsetConfig = new File(".\\word2vec-dump\\subsetconfig2.json");
 		Word2VecModel model = Word2VecFactory.get();
-		generateSubsetFiles(subsetConfig, Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir"), model.word2vec, model.vectorSize);
+		generateSubsetFiles(subsetConfig, Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir"), model.word2vec,
+				model.vectorSize);
 	}
 }
