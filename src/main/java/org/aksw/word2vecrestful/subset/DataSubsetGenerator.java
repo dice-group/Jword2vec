@@ -1,8 +1,10 @@
 package org.aksw.word2vecrestful.subset;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
@@ -13,13 +15,10 @@ import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -30,14 +29,12 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DataSubsetGenerator {
 
-	public static final JsonNodeFactory JSON_FACTORY = JsonNodeFactory.instance;
 	public static final String DATA_LABEL = "data";
 	public static final String KEY_LABEL = "key";
 	public static final String CENTROID_LABEL = "centroid";
 	public static final String SD_LABEL = "sd";
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
-	public static final ObjectWriter OBJ_WRITER = OBJ_MAPPER.writer(new DefaultPrettyPrinter());
 	/**
 	 * Method to generate subset json files for a given configuration and word2vec model
 	 * @param subsetConfig - configuration json file
@@ -66,12 +63,11 @@ public class DataSubsetGenerator {
 			ArrayNode centroid = (ArrayNode) curNode.get(CENTROID_LABEL);
 			// fetch value of standard deviation
 			ArrayNode stndrdDev = (ArrayNode) curNode.get(SD_LABEL);
-			// initiate a list of words
-			ArrayNode wordArr = OBJ_MAPPER.createArrayNode();
-			// Initialize result json
-			ObjectNode resObj = new ObjectNode(JSON_FACTORY);
-			// insert a mapping of key to list in the result json
-			resObj.set(key, wordArr);
+			// create an output file
+			File outputFile = new File(outputFileDir + "/" + key + ".txt");
+			outputFile.getParentFile().mkdirs();
+			// open an output stream
+			BufferedWriter bWriter = new BufferedWriter(new FileWriter(outputFile));
 			boolean limitNotSet = true;
 			// loop through the model
 			for (Entry<String, float[]> wordEntry : word2vec.entrySet()) {
@@ -96,14 +92,13 @@ public class DataSubsetGenerator {
 				}
 				limitNotSet = false;
 				if (isValid) {
-					// store the word in the list
-					wordArr.add(word);
+					// write the word in the file
+					bWriter.write(word);
+					bWriter.newLine();
 				}
 			}
-			// Persist each json file
-			File outputJsonFile = new File(outputFileDir + "/" + key + ".json");
-			outputJsonFile.getParentFile().mkdirs();
-			OBJ_WRITER.writeValue(outputJsonFile, resObj);
+			//Close the stream
+			bWriter.close();
 		}
 	}
 	/**

@@ -90,7 +90,7 @@ public class Word2VecModel {
  * @throws FileNotFoundException 
  * @throws JsonProcessingException 
    */
-  public Map<String, float[]> getClosestEntryInSub(float[] inpvec, String subsetKey) throws JsonProcessingException, FileNotFoundException, IOException{
+  public Map<String, float[]> getClosestEntryInSub(float[] inpvec, String subsetKey) throws IOException{
 	  Map<String, float[]> resMap = new HashMap<>();
 	  double minDist = -2;
 	  String minWord = null;
