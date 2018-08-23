@@ -4,8 +4,8 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +13,7 @@ import java.util.Map.Entry;
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
+import org.apache.commons.io.output.FileWriterWithEncoding;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,16 +23,26 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * Class to help generate and persist the subsets of a word2vec model
- * Expected json config format:
+ * Class to help generate and persist the subsets of a word2vec model Expected
+ * json config format:
  * 
- * {
- *  "data" : [ {
- *		"key" : "xyz",
- *		"centroid" : [...],
- *	    "sd" : [...]
- *	 }...]
- * }
+ * <pre>
+ *{
+ * "data" : [ {
+ *  "key" : "xyz",
+ *  "centroid" : [...],
+ *  "sd" : [...]
+ * }...]
+ *}
+ * </pre>
+ * <dl>
+ * <dt>key</dt>
+ * <dd>identification literal for the subset</dd>
+ * <dt>centroid</dt>
+ * <dd>centroid array for the subset</dd>
+ * <dt>sd</dt>
+ * <dd>standard deviation array for the subset</dd>
+ * </dl>
  * 
  * @author Nikit
  *
@@ -44,12 +55,19 @@ public class DataSubsetGenerator {
 	public static final String SD_LABEL = "sd";
 	public static final ObjectMapper OBJ_MAPPER = new ObjectMapper();
 	public static final ObjectReader OBJ_READER = OBJ_MAPPER.reader();
+
 	/**
-	 * Method to generate subset json files for a given configuration and word2vec model
-	 * @param subsetConfig - configuration json file
-	 * @param outputFileDir - output directory for the subset files
-	 * @param word2vec - word2vec model map
-	 * @param vectorSize - size of the vectors in model
+	 * Method to generate subset json files for a given configuration and word2vec
+	 * model
+	 * 
+	 * @param subsetConfig
+	 *            - configuration json file
+	 * @param outputFileDir
+	 *            - output directory for the subset files
+	 * @param word2vec
+	 *            - word2vec model map
+	 * @param vectorSize
+	 *            - size of the vectors in model
 	 * @throws JsonProcessingException
 	 * @throws FileNotFoundException
 	 * @throws IOException
@@ -76,7 +94,7 @@ public class DataSubsetGenerator {
 			File outputFile = new File(outputFileDir + "/" + key + ".txt");
 			outputFile.getParentFile().mkdirs();
 			// open an output stream
-			BufferedWriter bWriter = new BufferedWriter(new FileWriter(outputFile));
+			BufferedWriter bWriter = new BufferedWriter(new FileWriterWithEncoding(outputFile, StandardCharsets.UTF_8));
 			boolean limitNotSet = true;
 			// loop through the model
 			for (Entry<String, float[]> wordEntry : word2vec.entrySet()) {
@@ -106,12 +124,14 @@ public class DataSubsetGenerator {
 					bWriter.newLine();
 				}
 			}
-			//Close the stream
+			// Close the stream
 			bWriter.close();
 		}
 	}
+
 	/**
 	 * Method to demonstrate example usage
+	 * 
 	 * @param args
 	 * @throws JsonProcessingException
 	 * @throws FileNotFoundException

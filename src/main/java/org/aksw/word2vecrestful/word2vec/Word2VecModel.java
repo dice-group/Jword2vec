@@ -24,10 +24,12 @@ public class Word2VecModel {
   public int vectorSize;
   public TreeSet<VectorDimension> sortedVecDimns;
   public int[] dimRngIndxDesc;
+  private DataSubsetProvider dataSubsetProvider;
   public Word2VecModel(final Map<String, float[]> word2vec, final int vectorSize) {
     this.word2vec = word2vec;
     this.vectorSize = vectorSize;
     this.sortedVecDimns = new TreeSet<>();
+    this.dataSubsetProvider = new DataSubsetProvider();
     //fetch vector dimension details
     fetchVectorDimensions();
   }
@@ -97,7 +99,7 @@ public class Word2VecModel {
 	  float[] minVec = null;
 	  double tempDist;
 	  // Loop on the subset
-	  for(String word : DataSubsetProvider.fetchSubsetWords(subsetKey)) {
+	  for(String word : dataSubsetProvider.fetchSubsetWords(subsetKey)) {
 		  float[] wordvec = word2vec.get(word);
 		  tempDist = getSqEucDist(inpvec, wordvec, minDist);
 		  if(tempDist != -1) {

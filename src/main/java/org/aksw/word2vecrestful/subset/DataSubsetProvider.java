@@ -1,16 +1,15 @@
 package org.aksw.word2vecrestful.subset;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Cfg;
+import org.apache.commons.io.FileUtils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
@@ -22,8 +21,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
  */
 public class DataSubsetProvider {
 
-	public static String fileDir = Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir");
-	public static final Map<String, List<String>> SUBSET_MODELS = new HashMap<>();
+	private String fileDir = Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir");
+	private final Map<String, List<String>> SUBSET_MODELS = new HashMap<>();
 
 	/**
 	 * Method to fetch the list of words in a subset
@@ -35,37 +34,17 @@ public class DataSubsetProvider {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static List<String> fetchSubsetWords(String subsetKey)
-			throws IOException {
+	public List<String> fetchSubsetWords(String subsetKey) throws IOException {
 		// fetch from cache
 		List<String> resList = SUBSET_MODELS.get(subsetKey);
 		// if not in cache then read from file and add to cache
 		if (resList == null) {
-			resList = new ArrayList<>();
 			// logic to fetch the words from the stored subsets
-			File dir = new File(fileDir);
-			// declare inputstream
-			BufferedReader bReader = null;
-			File[] directoryListing = dir.listFiles();
-			if (directoryListing != null) {
-				for (File child : directoryListing) {
-					// Do something with child
-					if (child.getName().equalsIgnoreCase(appendFileExtension(subsetKey))) {
-						bReader = new BufferedReader(new FileReader(child));
-						break;
-					}
-				}
+			File file1 = new File(fileDir + "/" + appendFileExtension(subsetKey));
+			if (file1.exists()) {
+				resList = FileUtils.readLines(file1, StandardCharsets.UTF_8);
+				SUBSET_MODELS.put(subsetKey, resList);
 			}
-			if (bReader != null) {
-				while (true) {
-					String word = bReader.readLine();
-					if (word == null) {
-						break;
-					}
-					resList.add(word);
-				}
-			}
-			SUBSET_MODELS.put(subsetKey, resList);
 		}
 		return resList;
 	}
