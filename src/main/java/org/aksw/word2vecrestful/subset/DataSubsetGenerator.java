@@ -23,6 +23,15 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Class to help generate and persist the subsets of a word2vec model
+ * Expected json config format:
+ * 
+ * {
+ *  "data" : [ {
+ *		"key" : "xyz",
+ *		"centroid" : [...],
+ *	    "sd" : [...]
+ *	 }...]
+ * }
  * 
  * @author Nikit
  *
