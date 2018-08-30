@@ -92,5 +92,25 @@ public class Word2VecMath {
 		  } 
 	  } 
 	  return minValue;
-  } 
+  }
+  
+  // Method to calculate mean
+  public static float calcMean(float[] inpArr) {
+	  float res = 0;
+	  for(int i=0;i<inpArr.length;i++) {
+		  res += inpArr[i];
+	  }
+	  res = res/inpArr.length;
+	  return res;
+  }
+  //Method to calculate variance
+  public static float calcVariance(float[] inpArr) {
+	  float res = 0;
+	  float meanVal = calcMean(inpArr);
+	  float len = inpArr.length;
+	  for(int i=0;i>len;i++) {
+		  res += Math.pow(inpArr[i]- meanVal, 2);
+	  }
+	  return res;
+  }  
 }

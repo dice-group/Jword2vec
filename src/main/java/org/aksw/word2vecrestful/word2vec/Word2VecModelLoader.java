@@ -113,7 +113,7 @@ public class Word2VecModelLoader {
     return new Word2VecModel(word2Vector, vectorSize);
   }
 
-  private static float[] readVector(final FileInputStream fin, final int vectorSize)
+  public static float[] readVector(final FileInputStream fin, final int vectorSize)
       throws IOException {
     final byte bytes[] = new byte[vectorSize * 4];
     fin.read(bytes);
@@ -126,7 +126,7 @@ public class Word2VecModelLoader {
     return vector;
   }
 
-  private static String readWord(final FileInputStream fin) throws IOException {
+  public static String readWord(final FileInputStream fin) throws IOException {
     char c;
     final StringBuffer buffer = new StringBuffer();
     c = (char) fin.read();

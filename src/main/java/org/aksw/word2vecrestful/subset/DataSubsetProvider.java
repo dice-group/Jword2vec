@@ -5,8 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.apache.commons.io.FileUtils;
@@ -22,10 +23,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 public class DataSubsetProvider {
 
 	private String fileDir = Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir");
-	private final Map<String, List<String>> SUBSET_MODELS = new HashMap<>();
+	private final Map<String, Set<String>> SUBSET_MODELS = new HashMap<>();
 
 	/**
-	 * Method to fetch the list of words in a subset
+	 * Method to fetch the set of words in a subset
 	 * 
 	 * @param subsetKey
 	 *            - key to identify the subset
@@ -34,15 +35,16 @@ public class DataSubsetProvider {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public List<String> fetchSubsetWords(String subsetKey) throws IOException {
+	public Set<String> fetchSubsetWords(String subsetKey) throws IOException {
 		// fetch from cache
-		List<String> resList = SUBSET_MODELS.get(subsetKey);
+		Set<String> resList = SUBSET_MODELS.get(subsetKey);
 		// if not in cache then read from file and add to cache
 		if (resList == null) {
 			// logic to fetch the words from the stored subsets
 			File file1 = new File(fileDir + "/" + appendFileExtension(subsetKey));
 			if (file1.exists()) {
-				resList = FileUtils.readLines(file1, StandardCharsets.UTF_8);
+				resList = new HashSet<>();
+				resList.addAll(FileUtils.readLines(file1, StandardCharsets.UTF_8));
 				SUBSET_MODELS.put(subsetKey, resList);
 			}
 		}
