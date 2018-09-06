@@ -19,10 +19,10 @@ public class NormalizedInMemModelTest {
 		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
 
 		Map<String, String> wordKeyMap = new HashMap<>();
-		wordKeyMap.put("WesternOne", "ns#country-name");
+		/*wordKeyMap.put("WesternOne", "ns#country-name");
 		wordKeyMap.put("Donald_O._Schnuck", "ontology#ConferenceVenuePlacerdf-schema#label");
 		wordKeyMap.put("Skyytek", "icaltzd#summary");
-		wordKeyMap.put("Sungai_Muar", "ontology#Presenterrdf-schema#label");
+		wordKeyMap.put("Sungai_Muar", "ontology#Presenterrdf-schema#label");*/
 		wordKeyMap.put("cat", null);
 		wordKeyMap.put("dog", null);
 		wordKeyMap.put("airplane", null);
@@ -42,5 +42,12 @@ public class NormalizedInMemModelTest {
 
 		LOG.info("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
 
+	}
+	
+	public static void main(String[] args) {
+		LOG.info("Starting test!");
+		NormalizedInMemModelTest inMemModelTest = new NormalizedInMemModelTest();
+		inMemModelTest.testNormalizedModel();
+		LOG.info("Test finished!");
 	}
 }
