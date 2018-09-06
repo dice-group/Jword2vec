@@ -115,6 +115,7 @@
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>UTF-8</encoding>
+                    <argLine>-Xmx15024m</argLine>
                 </configuration>
             </plugin>
             <plugin>
@@ -124,6 +125,7 @@
                 <configuration>
                     <parallel>methods</parallel>
                     <threadCount>10</threadCount>
+                    <argLine>-Xmx15024m</argLine>
                 </configuration>
             </plugin>
         </plugins>
