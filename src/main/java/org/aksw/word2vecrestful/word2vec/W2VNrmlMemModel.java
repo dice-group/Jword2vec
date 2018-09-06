@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
 
 import org.aksw.word2vecrestful.subset.DataSubsetProvider;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
@@ -97,22 +96,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
+			//Find nearby vectors
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet);
-			closestVec = findClosestVecInNearbyVecs(nearbyVecs, vector);
+			// Select the closest vector
+			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
 		} catch (IOException e) {
 			LOG.error(e.getStackTrace());
 		}
-		return closestVec;
-	}
-
-	private Map<String, float[]> findClosestVecInNearbyVecs(Map<String, float[]> nearbyVecs, float[] vector) {
-		Map<String, float[]> closestVec = new HashMap<>();
-		TreeMap<Double, String> cosineSimMap = new TreeMap<>();
-		for (String word : nearbyVecs.keySet()) {
-			cosineSimMap.put(Word2VecMath.cosineSimilarity(vector, nearbyVecs.get(word)), word);
-		}
-		String closestWord = cosineSimMap.lastEntry().getValue();
-		closestVec.put(closestWord, nearbyVecs.get(closestWord));
 		return closestVec;
 	}
 

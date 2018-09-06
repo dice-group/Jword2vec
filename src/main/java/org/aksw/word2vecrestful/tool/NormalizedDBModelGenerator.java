@@ -1,7 +1,9 @@
-package org.aksw.word2vecrestful.db;
+package org.aksw.word2vecrestful.tool;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+
+import org.aksw.word2vecrestful.db.SQLiteDBHandler;
 
 public class NormalizedDBModelGenerator extends SQLiteDBHandler {
 

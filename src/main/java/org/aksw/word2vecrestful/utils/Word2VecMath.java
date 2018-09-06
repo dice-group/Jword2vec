@@ -1,5 +1,9 @@
 package org.aksw.word2vecrestful.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
+
 public class Word2VecMath {
 
   public static void main(final String[] args) {
@@ -112,5 +116,19 @@ public class Word2VecMath {
 		  res += Math.pow(inpArr[i]- meanVal, 2);
 	  }
 	  return res;
-  }  
+  }
+  
+  public static Map<String, float[]> findClosestVecInNearbyVecs(Map<String, float[]> nearbyVecs, float[] vector) {
+		Map<String, float[]> closestVec = null;
+		if(nearbyVecs !=null && vector != null) {
+			closestVec = new HashMap<>();
+			TreeMap<Double, String> cosineSimMap = new TreeMap<>();
+			for (String word : nearbyVecs.keySet()) {
+				cosineSimMap.put(Word2VecMath.cosineSimilarity(vector, nearbyVecs.get(word)), word);
+			}
+			String closestWord = cosineSimMap.lastEntry().getValue();
+			closestVec.put(closestWord, nearbyVecs.get(closestWord));
+		}
+		return closestVec;
+	}
 }

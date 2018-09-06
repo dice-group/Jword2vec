@@ -29,8 +29,8 @@ public class Word2VecModelLoader {
   }
 
   public static Logger LOG = LogManager.getLogger(Word2VecModelLoader.class);
-  public static final String CFG_KEY_BIN = Word2VecModelLoader.class.getName().concat(".bin");
-  protected boolean binModel = Boolean.parseBoolean(Cfg.get(CFG_KEY_BIN));
+  /*public static final String CFG_KEY_BIN = Word2VecModelLoader.class.getName().concat(".bin");
+  protected boolean binModel = Boolean.parseBoolean(Cfg.get(CFG_KEY_BIN));*/
 
   public static void main(final String[] a) {
 
@@ -50,7 +50,7 @@ public class Word2VecModelLoader {
    * @throws IOException
    * @throws FileNotFoundException
    */
-  public Word2VecModel loadModel(final File file) {
+  public Word2VecModel loadModel(final File file, boolean binModel) {
     int vectorSize = -1;
     int words = -1;
 

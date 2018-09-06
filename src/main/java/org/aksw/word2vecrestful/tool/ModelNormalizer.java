@@ -1,14 +1,17 @@
 package org.aksw.word2vecrestful.tool;
 
+import java.io.BufferedOutputStream;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-import org.aksw.word2vecrestful.db.NormalizedDBModelGenerator;
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
@@ -19,6 +22,8 @@ import org.apache.log4j.Logger;
 
 public class ModelNormalizer {
 	public static Logger LOG = LogManager.getLogger(ModelNormalizer.class);
+	public static final byte[] END_LINE_BA = "\n".getBytes(StandardCharsets.UTF_8);
+	public static final byte[] WHITESPACE_BA = " ".getBytes(StandardCharsets.UTF_8);
 
 	/**
 	 * Method to normalize a bin word2vec model line
@@ -37,6 +42,16 @@ public class ModelNormalizer {
 			resStr.append(" ").append(String.valueOf(vector[i]));
 		}
 		return resStr.toString();
+	}
+
+	public byte[] getNormalizedVecBA(float[] vector) {
+		vector = Word2VecMath.normalize(vector);
+		ByteBuffer buffer = ByteBuffer.allocate(vector.length * 4);
+		buffer.order(ByteOrder.LITTLE_ENDIAN);
+		for (int i = 0; i < vector.length; i++) {
+			buffer.putFloat(vector[i]);
+		}
+		return buffer.array();
 	}
 
 	/**
@@ -81,7 +96,7 @@ public class ModelNormalizer {
 			bWriter.close();
 		}
 	}
-	
+
 	/**
 	 * Method to persist a normalized model for a word2vec bin model
 	 * 
@@ -89,15 +104,15 @@ public class ModelNormalizer {
 	 *            - word2vec file of the model to be normalized
 	 * @param dbName
 	 *            - name of the database
-	 * @param tablName 
-	 * 			  - name of the table to store the data in
+	 * @param tablName
+	 *            - name of the table to store the data in
 	 * @throws IOException
-	 * @throws SQLException 
+	 * @throws SQLException
 	 */
 	public void persistNormalizedModel(File inputFile, String dbName, String tblName) throws IOException, SQLException {
 		// intialize handler instance
 		NormalizedDBModelGenerator dbHandler = null;
-		
+
 		FileInputStream fin = null;
 		try {
 			// reads file header
@@ -106,7 +121,7 @@ public class ModelNormalizer {
 			int words = Integer.parseInt(word);
 			word = Word2VecModelLoader.readWord(fin);
 			int vectorSize = Integer.parseInt(word);
-			dbHandler = new NormalizedDBModelGenerator(dbName, tblName, vectorSize); 
+			dbHandler = new NormalizedDBModelGenerator(dbName, tblName, vectorSize);
 			// open connection
 			dbHandler.connect();
 			LOG.info("Expecting " + words + " words with " + vectorSize + " values per vector.");
@@ -118,9 +133,9 @@ public class ModelNormalizer {
 				float[] vector = Word2VecModelLoader.readVector(fin, vectorSize);
 				// dbHandler.insertMainTblRecord(word, vector);
 				dbHandler.addMainTblInsrtBatch(word, Word2VecMath.normalize(vector), ps);
-				if((w+1)%50000 == 0) {
+				if ((w + 1) % 50000 == 0) {
 					dbHandler.executeBatchCommit(ps);
-					LOG.info((w+1)+" Records inserted.");
+					LOG.info((w + 1) + " Records inserted.");
 				}
 			}
 			dbHandler.executeBatchCommit(ps);
@@ -134,22 +149,86 @@ public class ModelNormalizer {
 		}
 	}
 
-	/*public static void main(String[] args) throws IOException {
-		String cfgKeyModel = Word2VecFactory.class.getName().concat(".model");
-		String model = (Cfg.get(cfgKeyModel));
-		ModelNormalizer modelNormalizer = new ModelNormalizer();
-		File inputFile = new File(model);
-		File outputFile = new File("D:\\Nikit\\DICE-Group\\Jword2vec\\data\\normal\\GoogleNews-vectors-negative300-normalized.txt");
-		modelNormalizer.generateNormalizedModel(inputFile, outputFile);
-	}*/
-	
+	/**
+	 * Method to generate a normalized model for a word2vec bin model
+	 * 
+	 * @param inputFile
+	 *            - word2vec file of the model to be normalized
+	 * @param outputFile
+	 *            - output file for normalized model
+	 * @throws IOException
+	 */
+	public void generateNormalizedBinModel(File inputFile, File outputFile) throws IOException {
+		// ensure directory creation
+		outputFile.getParentFile().mkdirs();
+		// open an output stream
+		BufferedOutputStream bOutStrm = null;
+		FileInputStream fin = null;
+		try {
+			bOutStrm = new BufferedOutputStream(new FileOutputStream(outputFile));
+			// reads file header
+			fin = new FileInputStream(inputFile);
+			String word = Word2VecModelLoader.readWord(fin);
+			bOutStrm.write(word.getBytes(StandardCharsets.UTF_8));
+			bOutStrm.write(WHITESPACE_BA);
+			Integer words = Integer.parseInt(word);
+			word = Word2VecModelLoader.readWord(fin);
+			bOutStrm.write(word.getBytes(StandardCharsets.UTF_8));
+			Integer vectorSize = Integer.parseInt(word);
+			bOutStrm.write(END_LINE_BA);
+			LOG.info("Expecting " + words + " words with " + vectorSize + " values per vector.");
+			for (int w = 0; w < words; ++w) {
+				word = Word2VecModelLoader.readWord(fin);
+				// LOG.info(word);
+				float[] vector = Word2VecModelLoader.readVector(fin, vectorSize);
+				
+				bOutStrm.write(word.getBytes(StandardCharsets.UTF_8));
+				bOutStrm.write(WHITESPACE_BA);
+				bOutStrm.write(getNormalizedVecBA(vector));
+
+				if ((w + 1) % 10000 == 0) {
+					bOutStrm.flush();
+					LOG.info((w + 1) + " Records inserted.");
+				}
+			}
+		} catch (final IOException e) {
+			LOG.error(e.getLocalizedMessage(), e);
+		} finally {
+			fin.close();
+			bOutStrm.close();
+		}
+	}
+
+	/*
+	 * public static void main(String[] args) throws IOException { String
+	 * cfgKeyModel = Word2VecFactory.class.getName().concat(".model"); String model
+	 * = (Cfg.get(cfgKeyModel)); ModelNormalizer modelNormalizer = new
+	 * ModelNormalizer(); File inputFile = new File(model); File outputFile = new
+	 * File(
+	 * "D:\\Nikit\\DICE-Group\\Jword2vec\\data\\normal\\GoogleNews-vectors-negative300-normalized.txt"
+	 * ); modelNormalizer.generateNormalizedModel(inputFile, outputFile); }
+	 */
+
+	/*
+	 * public static void main(String[] args) throws IOException, SQLException {
+	 * String cfgKeyModel = Word2VecFactory.class.getName().concat(".model"); String
+	 * model = (Cfg.get(cfgKeyModel)); ModelNormalizer modelNormalizer = new
+	 * ModelNormalizer(); File inputFile = new File(model); //
+	 * modelNormalizer.generateNormalizedModel(inputFile, outputFile);
+	 * modelNormalizer.persistNormalizedModel(inputFile,
+	 * "data/nrmldb/word2vecmodel", "wordtovec"); }
+	 */
+
 	public static void main(String[] args) throws IOException, SQLException {
 		String cfgKeyModel = Word2VecFactory.class.getName().concat(".model");
 		String model = (Cfg.get(cfgKeyModel));
 		ModelNormalizer modelNormalizer = new ModelNormalizer();
 		File inputFile = new File(model);
+		// "org.aksw.word2vecrestful.word2vec.normalizedbinmodel.model"
+		String outputModel = (Cfg.get("org.aksw.word2vecrestful.word2vec.normalizedbinmodel.model"));
+		File outputFile = new File(outputModel);
 		// modelNormalizer.generateNormalizedModel(inputFile, outputFile);
-		modelNormalizer.persistNormalizedModel(inputFile, "data/nrmldb/word2vecmodel", "wordtovec");
+		modelNormalizer.generateNormalizedBinModel(inputFile, outputFile);
 	}
 
 }
