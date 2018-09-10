@@ -32,7 +32,7 @@ public class Word2VecFactory {
 
 	public static W2VNrmlMemModel getNormalizedBinModel() {
 		Word2VecModel w2vmodel = new Word2VecModelLoader().loadModel(new File(nrmlBinMdlFilePath), nrmlBinMdlBinFlg);
-		LOG.debug("Model loaded to memory");
+		LOG.info("Model loaded to memory");
 		return new W2VNrmlMemModel(w2vmodel.word2vec, w2vmodel.vectorSize);
 	}
 }
