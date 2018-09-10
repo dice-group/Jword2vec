@@ -53,7 +53,9 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		this.indexesArr = new Object[vectorSize][2];
 		// Calculate sd*3/10 and save in map
 		// Initialize indexesArr unsorted
+		LOG.debug("Initializing indexes and calculating standard deviation");
 		this.setModelVals(word2vec, vectorSize);
+		LOG.debug("Sorting indexes");
 		// Sort the indexes
 		this.sortIndexes();
 	}
@@ -115,6 +117,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		} catch (IOException e) {
 			LOG.error(e.getStackTrace());
 		}
+		LOG.debug("Closest word found is "+closestVec.keySet());
 		return closestVec;
 	}
 
@@ -150,6 +153,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			dimValWordMap[0] = wordArr;
 			dimValWordMap[1] = dimsnArr;
 			this.indexesArr[i] = dimValWordMap;
+			LOG.debug("Dimension "+(i+1)+" index stored to memory");
 			// mean
 			float mean = sum / dimsnArr.length;
 			sum = 0;

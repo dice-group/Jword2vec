@@ -15,9 +15,9 @@ public class NormalizedInMemModelTest {
 
 	@Test
 	public void testNormalizedModel() {
-
+		LOG.debug("Starting InMemory indexed model test!");
 		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
-
+		LOG.debug("Indexed Model instance created");
 		Map<String, String> wordKeyMap = new HashMap<>();
 		/*wordKeyMap.put("WesternOne", "ns#country-name");
 		wordKeyMap.put("Donald_O._Schnuck", "ontology#ConferenceVenuePlacerdf-schema#label");
@@ -37,11 +37,11 @@ public class NormalizedInMemModelTest {
 			Assert.assertTrue(closestWord.containsKey(word));
 			diff = System.currentTimeMillis() - startTime;
 			totTime += diff;
-			LOG.info("Query time recorded for the word: '" + word + "' and subset: '" + wordKeyMap.get(word) + "' is "
+			LOG.debug("Query time recorded for the word: '" + word + "' and subset: '" + wordKeyMap.get(word) + "' is "
 					+ diff + " milliseconds.");
 		}
 
-		LOG.info("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
+		LOG.debug("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
 
 	}
 	
