@@ -190,10 +190,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			if (nearbyVecMap.size() > 0) {
 				mapEmpty = false;
-			} else if (mult > EXHAUSTION_MULT) {
-				notExhausted = false;
+			} else {
+				++mult;
+				if (mult > EXHAUSTION_MULT) {
+					notExhausted = false;
+				}
 			}
-
 		}
 		return nearbyVecMap;
 	}
@@ -220,9 +222,9 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			float[] dimsnValArr = (float[]) entryArr[1];
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
 			if (from < 0) {
-				// To select the index one behind the current element
+				// To select the index one after the current element
 				from = Math.abs(from);
-				from = from - (from>1?2:1);
+				from = from - (from > 1 ? 1 : 0);
 			}
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			if (to < 0) {
@@ -237,13 +239,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			} else {
 				nearbyWords.retainAll(tWordList);
 			}
-			if(nearbyWords.isEmpty()) {
+			if (nearbyWords.isEmpty()) {
 				break;
 			}
 		}
 		// Clear all the words not in wordset
 		nearbyWords.retainAll(wordSet);
-		for(String word: nearbyWords) {
+		for (String word : nearbyWords) {
 			nearbyVecMap.put(word, word2vec.get(word));
 		}
 	}

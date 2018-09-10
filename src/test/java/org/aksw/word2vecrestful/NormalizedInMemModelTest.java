@@ -26,6 +26,7 @@ public class NormalizedInMemModelTest {
 		wordKeyMap.put("cat", null);
 		wordKeyMap.put("dog", null);
 		wordKeyMap.put("airplane", null);
+		
 		wordKeyMap.put("road", null);
 		long startTime, diff;
 		long totTime = 0;
