@@ -157,7 +157,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			dimValWordMap[0] = wordArr;
 			dimValWordMap[1] = dimsnArr;
 			this.indexesArr[i] = dimValWordMap;
-			LOG.info("Dimension "+(i+1)+" index stored to memory");
+			LOG.info("Dimension "+(i)+" index stored to memory");
 			// mean
 			float mean = sum / dimsnArr.length;
 			sum = 0;
@@ -223,30 +223,37 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		float[] minVec = minMaxVec[0];
 		float[] maxVec = minMaxVec[1];
 		for (int i = 0; i < vectorSize; i++) {
+			LOG.info("Searching inside dimension "+(i)+"'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
 			Object[] entryArr = indexesArr[i];
 			String[] wordArr = (String[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
+			LOG.info("From value of dimension array: "+from);
 			if (from < 0) {
 				// To select the index one after the current element
 				from = Math.abs(from);
 				from = from - (from > 1 ? 1 : 0);
 			}
+			LOG.info("Final From value of dimension array: "+from);
+			LOG.info("To value of dimension array: "+from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			if (to < 0) {
 				// To select the index one after the current element
 				to = Math.abs(to);
 				to = to - (to > dimsnValArr.length ? 1 : 0);
 			}
+			LOG.info("Final To value of dimension array: "+from);
 			String[] tWords = Arrays.copyOfRange(wordArr, from, to);
+			LOG.info("Matching words list size for current dimension: "+tWords.length);
 			List<String> tWordList = Arrays.asList(tWords);
 			if (i == 0) {
 				nearbyWords.addAll(tWordList);
 			} else {
 				nearbyWords.retainAll(tWordList);
 			}
+			LOG.info("Nearby words list size for current dimension: "+nearbyWords.size());
 			if (nearbyWords.isEmpty()) {
 				break;
 			}
