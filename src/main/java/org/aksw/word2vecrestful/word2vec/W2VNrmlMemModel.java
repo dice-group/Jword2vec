@@ -247,11 +247,11 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			LOG.info("Final To value of dimension array: "+from);
 			String[] tWords = Arrays.copyOfRange(wordArr, from, to);
 			LOG.info("Matching words list size for current dimension: "+tWords.length);
-			List<String> tWordList = Arrays.asList(tWords);
+			Set<String> tWordSet = new HashSet<>(Arrays.asList(tWords));
 			if (i == 0) {
-				nearbyWords.addAll(tWordList);
+				nearbyWords.addAll(tWordSet);
 			} else {
-				nearbyWords.retainAll(tWordList);
+				nearbyWords.retainAll(tWordSet);
 			}
 			LOG.info("Nearby words list size for current dimension: "+nearbyWords.size());
 			if (nearbyWords.isEmpty()) {
