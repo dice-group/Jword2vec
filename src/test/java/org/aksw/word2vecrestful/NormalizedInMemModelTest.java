@@ -39,6 +39,7 @@ public class NormalizedInMemModelTest {
 		long startTime, diff;
 		long totTime = 0;
 		for (String word : wordKeyMap.keySet()) {
+			LOG.info("Sending query for word :"+ word);
 			startTime = System.currentTimeMillis();
 			float[] vec = memModel.getWord2VecMap().get(word);
 			Map<String, float[]> closestWord = memModel.getClosestSubEntry(vec, wordKeyMap.get(word));

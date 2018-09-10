@@ -58,6 +58,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		LOG.info("Sorting indexes");
 		// Sort the indexes
 		this.sortIndexes();
+		LOG.info("Sorting completed");
 	}
 
 	/**
@@ -108,10 +109,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			} else {
 				wordSet = dataSubsetProvider.fetchSubsetWords(subKey);
 			}
+			LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
+			LOG.info("fetching nearby vectors");
 			// Find nearby vectors
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet, true);
+			LOG.info("found the following nearby words: "+nearbyVecs.keySet());
 			// Select the closest vector
 			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
 		} catch (IOException e) {
@@ -316,10 +320,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 
 	private void sortIndexes() {
 		for (int i = 0; i < indexesArr.length; i++) {
+			LOG.info("Sorting index "+i);
 			Object[] entryArr = indexesArr[i];
 			String[] wordArr = (String[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
 			AssociativeSort.quickSort(dimsnValArr, wordArr);
+			LOG.info("Sorting completed for index "+i);
 		}
 	}
 
