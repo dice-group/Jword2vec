@@ -249,7 +249,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (from < 0) {
 				// To select the index one after the current element
 				from = Math.abs(from);
-				from = from - (from > 1 ? 1 : 0);
+				from = from - (from > 0 ? 1 : 0);
 			}
 			LOG.info("Final From value of dimension array: " + from);
 			LOG.info("To value of dimension array: " + from);
@@ -257,11 +257,11 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (to < 0) {
 				// To select the index one after the current element
 				to = Math.abs(to);
-				to = to - (to > dimsnValArr.length ? 1 : 0);
+				to = to - (to > dimsnValArr.length ? 2 : 1);
 			}
 			LOG.info("Final To value of dimension array: " + from);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
-			for (int j = from; j <= from; j++) {
+			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
 			}
 			if (i == 0) {
