@@ -2,9 +2,9 @@ package org.aksw.word2vecrestful.word2vec;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -46,11 +46,14 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 */
 	private Object[][] indexesArr;
 
+	private String[] gWordArr;
+	private float[][] gVecArr;
+
 	public W2VNrmlMemModel(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
 		this.dataSubsetProvider = new DataSubsetProvider();
-		this.indexesArr = new Object[vectorSize][2];
+		this.initArrays();
 		// Calculate sd*3/10 and save in map
 		// Initialize indexesArr unsorted
 		LOG.info("Initializing indexes and calculating standard deviation");
@@ -59,6 +62,18 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		// Sort the indexes
 		this.sortIndexes();
 		LOG.info("Sorting completed");
+	}
+
+	private void initArrays() {
+		this.indexesArr = new Object[vectorSize][2];
+		this.gWordArr = new String[word2vec.size()];
+		this.gVecArr = new float[word2vec.size()][vectorSize];
+		int i = 0;
+		for (Entry<String, float[]> entry : word2vec.entrySet()) {
+			gWordArr[i] = entry.getKey();
+			gVecArr[i] = entry.getValue();
+			i++;
+		}
 	}
 
 	/**
@@ -115,13 +130,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			LOG.info("fetching nearby vectors");
 			// Find nearby vectors
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet, true);
-			LOG.info("found the following nearby words: "+nearbyVecs.keySet());
+			LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
 			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
 		} catch (IOException e) {
 			LOG.error(e.getStackTrace());
 		}
-		LOG.info("Closest word found is "+closestVec.keySet());
+		LOG.info("Closest word found is " + closestVec.keySet());
 		return closestVec;
 	}
 
@@ -136,32 +151,29 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 */
 	public void setModelVals(Map<String, float[]> word2vecMap, int vectorSize) {
 		Map<Integer, Float> resMap = new HashMap<>();
-		Set<Entry<String, float[]>> entries = word2vecMap.entrySet();
 		int totSize = word2vecMap.size();
 		// loop all dimensions
 		for (int i = 0; i < vectorSize; i++) {
 			// loop through all the words
-			int j = 0;
 			float[] dimsnArr = new float[totSize];
-			String[] wordArr = new String[totSize];
+			int[] idArr = new int[totSize];
 			float sum = 0;
-			for (Entry<String, float[]> entry : entries) {
-				float[] vecArr = entry.getValue();
-				float val = vecArr[i];
+			for (int j = 0; j < gWordArr.length; j++) {
+				float val = gVecArr[j][i];
 				sum += val;
-				wordArr[j] = entry.getKey();
+				idArr[j] = j;
 				dimsnArr[j++] = val;
 			}
 			// Setting value in indexArr
 			Object[] dimValWordMap = new Object[2];
-			dimValWordMap[0] = wordArr;
+			dimValWordMap[0] = idArr;
 			dimValWordMap[1] = dimsnArr;
 			this.indexesArr[i] = dimValWordMap;
-			LOG.info("Dimension "+(i)+" index stored to memory");
+			LOG.info("Dimension " + (i) + " index stored to memory");
 			// mean
 			float mean = sum / dimsnArr.length;
 			sum = 0;
-			for (j = 0; j < dimsnArr.length; j++) {
+			for (int j = 0; j < dimsnArr.length; j++) {
 				sum += Math.pow(dimsnArr[j] - mean, 2);
 			}
 			float variance = sum / dimsnArr.length;
@@ -222,44 +234,59 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		Set<String> nearbyWords = new HashSet<>();
 		float[] minVec = minMaxVec[0];
 		float[] maxVec = minMaxVec[1];
+		BitSet finBitSet = new BitSet(word2vec.size());
+		BitSet tempBitSet;
 		for (int i = 0; i < vectorSize; i++) {
-			LOG.info("Searching inside dimension "+(i)+"'s index");
+			tempBitSet = new BitSet(word2vec.size());
+			LOG.info("Searching inside dimension " + (i) + "'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
 			Object[] entryArr = indexesArr[i];
-			String[] wordArr = (String[]) entryArr[0];
+			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
-			LOG.info("From value of dimension array: "+from);
+			LOG.info("From value of dimension array: " + from);
 			if (from < 0) {
 				// To select the index one after the current element
 				from = Math.abs(from);
 				from = from - (from > 1 ? 1 : 0);
 			}
-			LOG.info("Final From value of dimension array: "+from);
-			LOG.info("To value of dimension array: "+from);
+			LOG.info("Final From value of dimension array: " + from);
+			LOG.info("To value of dimension array: " + from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			if (to < 0) {
 				// To select the index one after the current element
 				to = Math.abs(to);
 				to = to - (to > dimsnValArr.length ? 1 : 0);
 			}
-			LOG.info("Final To value of dimension array: "+from);
-			String[] tWords = Arrays.copyOfRange(wordArr, from, to);
-			LOG.info("Matching words list size for current dimension: "+tWords.length);
-			Set<String> tWordSet = new HashSet<>(Arrays.asList(tWords));
-			if (i == 0) {
-				nearbyWords.addAll(tWordSet);
-			} else {
-				nearbyWords.retainAll(tWordSet);
+			LOG.info("Final To value of dimension array: " + from);
+			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
+			for (int j = from; j < from; j++) {
+				tempBitSet.set(idArr[j], true);
 			}
-			LOG.info("Nearby words list size for current dimension: "+nearbyWords.size());
-			if (nearbyWords.isEmpty()) {
+			if (i == 0) {
+				finBitSet = tempBitSet;
+			} else {
+				finBitSet.and(tempBitSet);
+			}
+			if (finBitSet.isEmpty()) {
 				break;
 			}
 		}
+		LOG.info("Extracting words for set bits");
+		int nextBit=0;
+		while (true) {
+			nextBit = finBitSet.nextSetBit(nextBit);
+			if (nextBit > -1) {
+				nearbyWords.add(gWordArr[nextBit]);
+			} else {
+				break;
+			}
+		}
+		LOG.info("Nearby words size before retainAll from wordset: "+ nearbyWords.size());
 		// Clear all the words not in wordset
 		nearbyWords.retainAll(wordSet);
+		LOG.info("Nearby words size after retainAll from wordset: "+ nearbyWords.size());
 		for (String word : nearbyWords) {
 			nearbyVecMap.put(word, word2vec.get(word));
 		}
@@ -327,12 +354,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 
 	private void sortIndexes() {
 		for (int i = 0; i < indexesArr.length; i++) {
-			LOG.info("Sorting index "+i);
+			LOG.info("Sorting index " + i);
 			Object[] entryArr = indexesArr[i];
-			String[] wordArr = (String[]) entryArr[0];
+			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
-			AssociativeSort.quickSort(dimsnValArr, wordArr);
-			LOG.info("Sorting completed for index "+i);
+			AssociativeSort.quickSort(dimsnValArr, idArr);
+			LOG.info("Sorting completed for index " + i);
 		}
 	}
 
