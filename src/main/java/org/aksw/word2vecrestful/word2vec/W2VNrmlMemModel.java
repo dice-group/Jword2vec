@@ -56,12 +56,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		this.initArrays();
 		// Calculate sd*3/10 and save in map
 		// Initialize indexesArr unsorted
-		LOG.info("Initializing indexes and calculating standard deviation");
+		// LOG.info("Initializing indexes and calculating standard deviation");
 		this.setModelVals(word2vec, vectorSize);
-		LOG.info("Sorting indexes");
+		// LOG.info("Sorting indexes");
 		// Sort the indexes
 		this.sortIndexes();
-		LOG.info("Sorting completed");
+		// LOG.info("Sorting completed");
 	}
 
 	private void initArrays() {
@@ -124,19 +124,19 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			} else {
 				wordSet = dataSubsetProvider.fetchSubsetWords(subKey);
 			}
-			LOG.info("Normalizing input vector");
+			// LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
-			LOG.info("fetching nearby vectors");
+			// LOG.info("fetching nearby vectors");
 			// Find nearby vectors
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet, true);
-			LOG.info("found the following nearby words: " + nearbyVecs.keySet());
+			// LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
 			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
 		} catch (IOException e) {
-			LOG.error(e.getStackTrace());
+			// LOG.error(e.getStackTrace());
 		}
-		LOG.info("Closest word found is " + closestVec.keySet());
+		// LOG.info("Closest word found is " + closestVec.keySet());
 		return closestVec;
 	}
 
@@ -169,7 +169,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			dimValWordMap[0] = idArr;
 			dimValWordMap[1] = dimsnArr;
 			this.indexesArr[i] = dimValWordMap;
-			LOG.info("Dimension " + (i) + " index stored to memory");
+			// LOG.info("Dimension " + (i) + " index stored to memory");
 			// mean
 			float mean = sum / dimsnArr.length;
 			sum = 0;
@@ -213,7 +213,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				if (mult > EXHAUSTION_MULT) {
 					notExhausted = false;
 				}
-				LOG.info("MinMax multiplier incremented to " + mult);
+				// LOG.info("MinMax multiplier incremented to " + mult);
 			}
 		}
 		return nearbyVecMap;
@@ -237,22 +237,22 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		BitSet tempBitSet;
 		for (int i = 0; i < vectorSize; i++) {
 			tempBitSet = new BitSet(word2vec.size());
-			LOG.info("Searching inside dimension " + (i) + "'s index");
+			// LOG.info("Searching inside dimension " + (i) + "'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
-			LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " + maxVal);
+			// LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " + maxVal);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
-			LOG.info("From value of dimension array: " + from);
+			// LOG.info("From value of dimension array: " + from);
 			if (from < 0) {
 				// To select the insertion point
 				from = -1 - from;
 			}
-			LOG.info("Final From value of current dimension array: " + from);
+			// LOG.info("Final From value of current dimension array: " + from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
-			LOG.info("To value of dimension array: " + to);
+			// LOG.info("To value of dimension array: " + to);
 			if (to < 0) {
 				// To select the insertion point
 				to = -1 - to;
@@ -260,8 +260,8 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				// Because binarySearch returns the exact index if element exists
 				to++;
 			}
-			LOG.info("Final To value of current dimension array: " + to);
-			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
+			// LOG.info("Final To value of current dimension array: " + to);
+			// LOG.info("Setting bits for the words between 'from' and 'to' indexes");
 			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
 			}
@@ -271,11 +271,11 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				finBitSet.and(tempBitSet);
 			}
 			if (finBitSet.isEmpty()) {
-				LOG.info("Word not found in the current min-max area.");
+				// LOG.info("Word not found in the current min-max area.");
 				break;
 			}
 		}
-		LOG.info("Extracting words for set bits");
+		// LOG.info("Extracting words for set bits");
 
 		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
 			// operate on index i here
@@ -284,10 +284,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				break; // or (i+1) would overflow
 			}
 		}
-		LOG.info("Nearby words size before retainAll from wordset: " + nearbyWords.size());
+		// LOG.info("Nearby words size before retainAll from wordset: " + nearbyWords.size());
 		// Clear all the words not in wordset
 		nearbyWords.retainAll(wordSet);
-		LOG.info("Nearby words size after retainAll from wordset: " + nearbyWords.size());
+		// LOG.info("Nearby words size after retainAll from wordset: " + nearbyWords.size());
 		for (String word : nearbyWords) {
 			nearbyVecMap.put(word, word2vec.get(word));
 		}
@@ -337,12 +337,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 
 	private void sortIndexes() {
 		for (int i = 0; i < indexesArr.length; i++) {
-			LOG.info("Sorting index " + i);
+			// LOG.info("Sorting index " + i);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
 			AssociativeSort.quickSort(dimsnValArr, idArr);
-			LOG.info("Sorting completed for index " + i);
+			// LOG.info("Sorting completed for index " + i);
 		}
 	}
 
