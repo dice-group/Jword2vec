@@ -241,6 +241,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			LOG.info("Searching inside dimension " + (i) + "'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
+			LOG.info("MinVal and MaxVal for the current dimension: "+minVal+" "+maxVal);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
@@ -249,7 +250,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (from < 0) {
 				// To select the index one after the current element
 				from = Math.abs(from);
-				from = from - (from > 0 ? 1 : 0);
+				from = from - (from > 1 ? 2 : 1);
 			}
 			LOG.info("Final From value of dimension array: " + from);
 			LOG.info("To value of dimension array: " + from);
