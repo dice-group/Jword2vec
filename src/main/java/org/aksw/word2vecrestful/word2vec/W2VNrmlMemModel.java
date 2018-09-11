@@ -29,7 +29,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 
 	private Map<String, float[]> word2vec;
 	private int vectorSize;
-	private Map<Integer, Float> sdMap;
+	private float[] sdArr;
 	/**
 	 * Limit to the multiplier of area in which nearby vectors are to be looked
 	 */
@@ -161,7 +161,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 *            - size of each vector
 	 */
 	public void setModelVals(Map<String, float[]> word2vecMap, int vectorSize) {
-		Map<Integer, Float> resMap = new HashMap<>();
+		float[] resMap = new float[vectorSize];
 		int totSize = word2vecMap.size();
 		// loop all dimensions
 		for (int i = 0; i < vectorSize; i++) {
@@ -189,10 +189,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			float variance = sum / dimsnArr.length;
 			Double sd = Math.sqrt(variance);
-			resMap.put(i, sd.floatValue() * SIGMA_MULT / AREA_DIVISOR);
+			resMap[i] = sd.floatValue() * SIGMA_MULT / AREA_DIVISOR;
 		}
 		// Set as sdMap
-		this.sdMap = resMap;
+		this.sdArr = resMap;
 	}
 
 	/**
@@ -208,10 +208,14 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		Map<String, float[]> nearbyVecMap = new HashMap<>();
 		boolean mapEmpty = true;
 		boolean notExhausted = true;
-		float[][] minMaxVec;
+		float[][] minMaxVec = getMinMaxVec(vector);
 		int mult = 1;
 		while (mapEmpty && notExhausted) {
-			minMaxVec = getMinMaxVec(vector, mult);
+			if (mult > 1) {
+				tl.logTime(8);
+				incrementMinMaxVec(minMaxVec);
+				tl.printTime(8, "incrementMinMaxVec");
+			}
 			tl.printTime(2, "getMinMaxVec");
 			if (indxd) {
 				tl.logTime(4);
@@ -277,10 +281,12 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				to++;
 			}
 			// LOG.info("Final To value of current dimension array: " + to);
-			// LOG.info("Setting bits for the words between 'from' and 'to' indexes");
+			LOG.info("Setting bits for the words between 'from' and 'to' indexes:\t"+from+" "+to);
+			tl.logTime(9);
 			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
 			}
+			tl.printTime(9, "Setting bits for index"+i);
 			if (i == 0) {
 				finBitSet = tempBitSet;
 			} else {
@@ -345,16 +351,29 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 *            - input vector to perform operation on
 	 * @return - min vector at index 0 and max vector at index 1
 	 */
-	private float[][] getMinMaxVec(float[] vector, int mult) {
+	private float[][] getMinMaxVec(float[] vector) {
 		float[][] resVec = new float[2][vector.length];
 		for (int i = 0; i < vector.length; i++) {
-			float diff = mult * sdMap.get(i);
+			// TODO: change sdmap to array
+			float diff = sdArr[i];
 			// MinVec
 			resVec[0][i] = vector[i] - diff;
 			// MaxVec
 			resVec[1][i] = vector[i] + diff;
 		}
 		return resVec;
+	}
+
+	private void incrementMinMaxVec(float[][] minMaxVec) {
+		float[] minVec = minMaxVec[0];
+		float[] maxVec = minMaxVec[1];
+		for (int i = 0; i < vectorSize; i++) {
+			float diff = sdArr[i];
+			// MinVec
+			minVec[i] -= diff;
+			// MaxVec
+			maxVec[i] += diff;
+		}
 	}
 
 	private void sortIndexes() {
