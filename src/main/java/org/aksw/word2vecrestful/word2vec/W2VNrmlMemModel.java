@@ -260,7 +260,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			} else {
 				to++;
 			}
-			LOG.info("Final To value of current dimension array: " + from);
+			LOG.info("Final To value of current dimension array: " + to);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
 			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
