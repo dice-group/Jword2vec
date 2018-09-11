@@ -252,8 +252,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				// To select the index one after the current element
 				from = Math.abs(from);
 				from = from - (from > 1 ? 2 : 1);
+			} else {
+				from--;
 			}
-			LOG.info("Final From value of dimension array: " + from);
+			LOG.info("Final From value of current dimension array: " + from);
 			LOG.info("To value of dimension array: " + from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			if (to < 0) {
@@ -261,7 +263,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				to = Math.abs(to);
 				to = to - (to > dimsnValArr.length ? 1 : 0);
 			}
-			LOG.info("Final To value of dimension array: " + from);
+			LOG.info("Final To value of current dimension array: " + from);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
 			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
@@ -278,14 +280,14 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		}
 		LOG.info("Extracting words for set bits");
 		int nextBit=0;
-		while (!finBitEmpty) {
-			nextBit = finBitSet.nextSetBit(nextBit);
-			if (nextBit > -1) {
-				nearbyWords.add(gWordArr[nextBit]);
-			} else {
-				break;
-			}
-		}
+		
+		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i+1)) {
+		     // operate on index i here
+			 nearbyWords.add(gWordArr[nextBit]);
+		     if (i == Integer.MAX_VALUE) {
+		         break; // or (i+1) would overflow
+		     }
+		 }
 		LOG.info("Nearby words size before retainAll from wordset: "+ nearbyWords.size());
 		// Clear all the words not in wordset
 		nearbyWords.retainAll(wordSet);
