@@ -43,7 +43,7 @@ public class NormalizedInMemModelTest {
 					+ diff + " milliseconds.");
 		}
 
-		LOG.debug("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
+		LOG.info("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
 
 	}
 

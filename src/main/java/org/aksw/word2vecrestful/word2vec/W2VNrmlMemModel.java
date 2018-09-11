@@ -15,6 +15,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
+import nikit.test.TimeLogger;
+
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform
  * search on the model
@@ -48,6 +50,9 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 
 	private String[] gWordArr;
 	private float[][] gVecArr;
+
+	// TODO : Remove this
+	private TimeLogger tl = new TimeLogger();
 
 	public W2VNrmlMemModel(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
@@ -122,17 +127,23 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (subKey == null) {
 				wordSet = word2vec.keySet();
 			} else {
+				tl.logTime(1);
 				wordSet = dataSubsetProvider.fetchSubsetWords(subKey);
+				tl.printTime(1, "fetchSubsetWords");
 			}
 			// LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
 			// LOG.info("fetching nearby vectors");
 			// Find nearby vectors
+			tl.logTime(2);
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet, true);
+			tl.printTime(2, "fetchNearbyVectors");
 			// LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
+			tl.logTime(3);
 			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
+			tl.printTime(3, "findClosestVecInNearbyVecs");
 		} catch (IOException e) {
 			// LOG.error(e.getStackTrace());
 		}
@@ -201,8 +212,11 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		int mult = 1;
 		while (mapEmpty && notExhausted) {
 			minMaxVec = getMinMaxVec(vector, mult);
+			tl.printTime(2, "getMinMaxVec");
 			if (indxd) {
+				tl.logTime(4);
 				putNearbyVecsIndxd(minMaxVec, wordSet, nearbyVecMap);
+				tl.printTime(4, "putNearbyVecsIndxd");
 			} else {
 				putNearbyVecsNonIndxd(minMaxVec, wordSet, nearbyVecMap);
 			}
@@ -235,12 +249,14 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		float[] maxVec = minMaxVec[1];
 		BitSet finBitSet = null;
 		BitSet tempBitSet;
+		tl.logTime(5);
 		for (int i = 0; i < vectorSize; i++) {
 			tempBitSet = new BitSet(word2vec.size());
 			// LOG.info("Searching inside dimension " + (i) + "'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
-			// LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " + maxVal);
+			// LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " +
+			// maxVal);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
@@ -276,7 +292,8 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 		}
 		// LOG.info("Extracting words for set bits");
-
+		tl.printTime(5, "Setting Bitset");
+		tl.logTime(6);
 		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
 			// operate on index i here
 			nearbyWords.add(gWordArr[i]);
@@ -284,10 +301,15 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				break; // or (i+1) would overflow
 			}
 		}
-		// LOG.info("Nearby words size before retainAll from wordset: " + nearbyWords.size());
+		tl.printTime(6, "extracting words");
+		// LOG.info("Nearby words size before retainAll from wordset: " +
+		// nearbyWords.size());
 		// Clear all the words not in wordset
+		tl.logTime(7);
 		nearbyWords.retainAll(wordSet);
-		// LOG.info("Nearby words size after retainAll from wordset: " + nearbyWords.size());
+		tl.printTime(7, "retaining words");
+		// LOG.info("Nearby words size after retainAll from wordset: " +
+		// nearbyWords.size());
 		for (String word : nearbyWords) {
 			nearbyVecMap.put(word, word2vec.get(word));
 		}
