@@ -34,6 +34,9 @@ public class Word2VecFactory {
 		LOG.info("Loading model to memory");
 		Word2VecModel w2vmodel = new Word2VecModelLoader().loadModel(new File(nrmlBinMdlFilePath), nrmlBinMdlBinFlg);
 		LOG.info("Model loaded to memory");
-		return new W2VNrmlMemModel(w2vmodel.word2vec, w2vmodel.vectorSize);
+		LOG.info("Initializing "+W2VNrmlMemModel.class + " instance");
+		W2VNrmlMemModel nrmlMemModel = new W2VNrmlMemModel(w2vmodel.word2vec, w2vmodel.vectorSize);
+		LOG.info("Initialization of "+W2VNrmlMemModel.class + " instance finished");
+		return nrmlMemModel;
 	}
 }
