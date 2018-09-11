@@ -162,7 +162,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				float val = gVecArr[j][i];
 				sum += val;
 				idArr[j] = j;
-				dimsnArr[j++] = val;
+				dimsnArr[j] = val;
 			}
 			// Setting value in indexArr
 			Object[] dimValWordMap = new Object[2];

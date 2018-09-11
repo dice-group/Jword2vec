@@ -24,22 +24,15 @@ public class NormalizedInMemModelTest {
 		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
 		LOG.info("Indexed Model instance created");
 		Map<String, String> wordKeyMap = new HashMap<>();
-		/*
-		 * wordKeyMap.put("WesternOne", "ns#country-name");
-		 * wordKeyMap.put("Donald_O._Schnuck",
-		 * "ontology#ConferenceVenuePlacerdf-schema#label"); wordKeyMap.put("Skyytek",
-		 * "icaltzd#summary"); wordKeyMap.put("Sungai_Muar",
-		 * "ontology#Presenterrdf-schema#label");
-		 */
 		wordKeyMap.put("cat", null);
 		wordKeyMap.put("dog", null);
 		wordKeyMap.put("airplane", null);
-
 		wordKeyMap.put("road", null);
+		
 		long startTime, diff;
 		long totTime = 0;
 		for (String word : wordKeyMap.keySet()) {
-			LOG.info("Sending query for word :"+ word);
+			LOG.info("Sending query for word :" + word);
 			startTime = System.currentTimeMillis();
 			float[] vec = memModel.getWord2VecMap().get(word);
 			Map<String, float[]> closestWord = memModel.getClosestSubEntry(vec, wordKeyMap.get(word));
