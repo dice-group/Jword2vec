@@ -236,6 +236,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		float[] maxVec = minMaxVec[1];
 		BitSet finBitSet = null;
 		BitSet tempBitSet;
+		boolean finBitEmpty = false;
 		for (int i = 0; i < vectorSize; i++) {
 			tempBitSet = new BitSet(word2vec.size());
 			LOG.info("Searching inside dimension " + (i) + "'s index");
@@ -258,7 +259,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (to < 0) {
 				// To select the index one after the current element
 				to = Math.abs(to);
-				to = to - (to > dimsnValArr.length ? 2 : 1);
+				to = to - (to > dimsnValArr.length ? 1 : 0);
 			}
 			LOG.info("Final To value of dimension array: " + from);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
@@ -271,12 +272,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				finBitSet.and(tempBitSet);
 			}
 			if (finBitSet.isEmpty()) {
+				finBitEmpty = true;
 				break;
 			}
 		}
 		LOG.info("Extracting words for set bits");
 		int nextBit=0;
-		while (true) {
+		while (!finBitEmpty) {
 			nextBit = finBitSet.nextSetBit(nextBit);
 			if (nextBit > -1) {
 				nearbyWords.add(gWordArr[nextBit]);
