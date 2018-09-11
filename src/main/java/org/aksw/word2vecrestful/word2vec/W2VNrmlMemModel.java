@@ -197,12 +197,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		Map<String, float[]> nearbyVecMap = new HashMap<>();
 		boolean mapEmpty = true;
 		boolean notExhausted = true;
-		float[][] minMaxVec = getMinMaxVec(vector);
+		float[][] minMaxVec;
 		int mult = 1;
 		while (mapEmpty && notExhausted) {
-			if (mult > 1) {
-				minMaxVec = multMinMaxVec(minMaxVec, mult);
-			}
+			minMaxVec = getMinMaxVec(vector, mult);
 			if (indxd) {
 				putNearbyVecsIndxd(minMaxVec, wordSet, nearbyVecMap);
 			} else {
@@ -215,6 +213,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				if (mult > EXHAUSTION_MULT) {
 					notExhausted = false;
 				}
+				LOG.info("MinMax multiplier incremented to " + mult);
 			}
 		}
 		return nearbyVecMap;
@@ -272,6 +271,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				finBitSet.and(tempBitSet);
 			}
 			if (finBitSet.isEmpty()) {
+				LOG.info("Word not found in the current min-max area.");
 				break;
 			}
 		}
@@ -316,24 +316,6 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	}
 
 	/**
-	 * Multiply each element of the given multi dimensional vector with a given
-	 * multiplier
-	 * 
-	 * @param minMaxVec
-	 *            - vector at which operation is to be performed
-	 * @param mult
-	 *            - multiplier
-	 * @return - Vector after multiplication with the multiplier
-	 */
-	private float[][] multMinMaxVec(float[][] minMaxVec, int mult) {
-		for (int i = 0; i < minMaxVec[0].length; i++) {
-			minMaxVec[0][i] = minMaxVec[0][i] * mult;
-			minMaxVec[1][i] = minMaxVec[1][i] * mult;
-		}
-		return minMaxVec;
-	}
-
-	/**
 	 * Method to generate two vectors from a given vector by adding and subtracting
 	 * value in sdMap from the given vector
 	 * 
@@ -341,10 +323,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 *            - input vector to perform operation on
 	 * @return - min vector at index 0 and max vector at index 1
 	 */
-	private float[][] getMinMaxVec(float[] vector) {
+	private float[][] getMinMaxVec(float[] vector, int mult) {
 		float[][] resVec = new float[2][vector.length];
 		for (int i = 0; i < vector.length; i++) {
-			float diff = sdMap.get(i);
+			float diff = mult * sdMap.get(i);
 			// MinVec
 			resVec[0][i] = vector[i] - diff;
 			// MaxVec
