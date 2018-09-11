@@ -241,7 +241,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			LOG.info("Searching inside dimension " + (i) + "'s index");
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
-			LOG.info("MinVal and MaxVal for the current dimension: "+minVal+" "+maxVal);
+			LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " + maxVal);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
@@ -250,13 +250,13 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			if (from < 0) {
 				// To select the insertion point
 				from = -1 - from;
-			} 
+			}
 			LOG.info("Final From value of current dimension array: " + from);
-			LOG.info("To value of dimension array: " + from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
+			LOG.info("To value of dimension array: " + to);
 			if (to < 0) {
 				// To select the insertion point
-				to = -1-to;
+				to = -1 - to;
 			} else {
 				to++;
 			}
@@ -275,19 +275,19 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 		}
 		LOG.info("Extracting words for set bits");
-		int nextBit=0;
-		
-		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i+1)) {
-		     // operate on index i here
-			 nearbyWords.add(gWordArr[nextBit]);
-		     if (i == Integer.MAX_VALUE) {
-		         break; // or (i+1) would overflow
-		     }
-		 }
-		LOG.info("Nearby words size before retainAll from wordset: "+ nearbyWords.size());
+		int nextBit = 0;
+
+		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
+			// operate on index i here
+			nearbyWords.add(gWordArr[nextBit]);
+			if (i == Integer.MAX_VALUE) {
+				break; // or (i+1) would overflow
+			}
+		}
+		LOG.info("Nearby words size before retainAll from wordset: " + nearbyWords.size());
 		// Clear all the words not in wordset
 		nearbyWords.retainAll(wordSet);
-		LOG.info("Nearby words size after retainAll from wordset: "+ nearbyWords.size());
+		LOG.info("Nearby words size after retainAll from wordset: " + nearbyWords.size());
 		for (String word : nearbyWords) {
 			nearbyVecMap.put(word, word2vec.get(word));
 		}
