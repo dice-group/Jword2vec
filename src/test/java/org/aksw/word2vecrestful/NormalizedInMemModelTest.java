@@ -12,13 +12,15 @@ import org.apache.log4j.PropertyConfigurator;
 import org.junit.Assert;
 import org.junit.Test;
 
+import nikit.test.TestConst;
+
 public class NormalizedInMemModelTest {
 	static {
 		PropertyConfigurator.configure(Cfg.LOG_FILE);
 	}
 	public static Logger LOG = LogManager.getLogger(NormalizedInMemModelTest.class);
 
-	@Test
+	/*@Test
 	public void testNormalizedModel() {
 		LOG.info("Starting InMemory indexed model test!");
 		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
@@ -45,12 +47,28 @@ public class NormalizedInMemModelTest {
 
 		LOG.info("Average query time: " + (totTime / wordKeyMap.size()) + " milliseconds");
 
-	}
+	}*/
+	
+	@Test
+	public void testNbmTime() {
+		LOG.info("Starting InMemory indexed model test!");
+		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
+		float[][] centroids = {TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5};
+		
+		long startTime, diff;
+		long totTime = 0;
+		for (int i=0;i<centroids.length;i++) {
+			LOG.info("Sending query for Centroid " + (i+1) );
+			startTime = System.currentTimeMillis();
+			Map<String, float[]> closestWord = memModel.getClosestSubEntry( centroids[i], null);
+			diff = System.currentTimeMillis() - startTime;
+			totTime += diff;
+			LOG.info(closestWord.keySet());
+			LOG.info("Query time recorded for Centroid " + (i+1) + " is "
+					+ diff + " milliseconds.");
+		}
 
-	public static void main(String[] args) {
-		LOG.info("Starting test!");
-		NormalizedInMemModelTest inMemModelTest = new NormalizedInMemModelTest();
-		inMemModelTest.testNormalizedModel();
-		LOG.info("Test finished!");
+		LOG.info("Average query time: " + (totTime / centroids.length) + " milliseconds");
+
 	}
 }

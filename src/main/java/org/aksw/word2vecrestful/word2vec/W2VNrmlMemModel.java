@@ -278,11 +278,9 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			// LOG.info("Final To value of current dimension array: " + to);
 			// LOG.info("Setting bits for the words between 'from' and 'to' indexes");
-			tl.logTime(8);
 			for (int j = from; j < to; j++) {
 				tempBitSet.set(idArr[j], true);
 			}
-			tl.printTime(8, "setting bits");
 			if (i == 0) {
 				finBitSet = tempBitSet;
 			} else {
