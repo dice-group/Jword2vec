@@ -119,9 +119,8 @@ public class Word2VecMath {
   }
   
   public static Map<String, float[]> findClosestVecInNearbyVecs(Map<String, float[]> nearbyVecs, float[] vector) {
-		Map<String, float[]> closestVec = null;
-		if(nearbyVecs !=null && vector != null) {
-			closestVec = new HashMap<>();
+		Map<String, float[]> closestVec = new HashMap<>();
+		if(nearbyVecs !=null && vector != null && nearbyVecs.size()>0) {
 			TreeMap<Double, String> cosineSimMap = new TreeMap<>();
 			for (String word : nearbyVecs.keySet()) {
 				cosineSimMap.put(Word2VecMath.cosineSimilarity(vector, nearbyVecs.get(word)), word);

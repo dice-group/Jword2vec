@@ -234,7 +234,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		Set<String> nearbyWords = new HashSet<>();
 		float[] minVec = minMaxVec[0];
 		float[] maxVec = minMaxVec[1];
-		BitSet finBitSet = new BitSet(word2vec.size());
+		BitSet finBitSet = null;
 		BitSet tempBitSet;
 		for (int i = 0; i < vectorSize; i++) {
 			tempBitSet = new BitSet(word2vec.size());
@@ -261,7 +261,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			LOG.info("Final To value of dimension array: " + from);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
-			for (int j = from; j < from; j++) {
+			for (int j = from; j <= from; j++) {
 				tempBitSet.set(idArr[j], true);
 			}
 			if (i == 0) {
