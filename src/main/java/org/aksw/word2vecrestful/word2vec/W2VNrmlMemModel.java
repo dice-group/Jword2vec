@@ -33,7 +33,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	/**
 	 * Limit to the multiplier of area in which nearby vectors are to be looked
 	 */
-	private static final int EXHAUSTION_MULT = 30;
+	private static final int EXHAUSTION_MULT = 20;
 	/**
 	 * Multiplier for the standard deviation
 	 */
@@ -41,7 +41,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	/**
 	 * Divisor for the standard deviation's value
 	 */
-	private static final int AREA_DIVISOR = 30;
+	private static final int AREA_DIVISOR = 20;
 	private DataSubsetProvider dataSubsetProvider;
 	/**
 	 * Contains the sorted dimensional values mapped to their words
