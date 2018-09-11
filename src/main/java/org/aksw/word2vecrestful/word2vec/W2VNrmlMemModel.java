@@ -236,7 +236,6 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		float[] maxVec = minMaxVec[1];
 		BitSet finBitSet = null;
 		BitSet tempBitSet;
-		boolean finBitEmpty = false;
 		for (int i = 0; i < vectorSize; i++) {
 			tempBitSet = new BitSet(word2vec.size());
 			LOG.info("Searching inside dimension " + (i) + "'s index");
@@ -249,19 +248,17 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
 			LOG.info("From value of dimension array: " + from);
 			if (from < 0) {
-				// To select the index one after the current element
-				from = Math.abs(from);
-				from = from - (from > 1 ? 2 : 1);
-			} else {
-				from--;
-			}
+				// To select the insertion point
+				from = -1 - from;
+			} 
 			LOG.info("Final From value of current dimension array: " + from);
 			LOG.info("To value of dimension array: " + from);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			if (to < 0) {
-				// To select the index one after the current element
-				to = Math.abs(to);
-				to = to - (to > dimsnValArr.length ? 1 : 0);
+				// To select the insertion point
+				to = -1-to;
+			} else {
+				to++;
 			}
 			LOG.info("Final To value of current dimension array: " + from);
 			LOG.info("Setting bits for the words between 'from' and 'to' indexes");
@@ -274,7 +271,6 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				finBitSet.and(tempBitSet);
 			}
 			if (finBitSet.isEmpty()) {
-				finBitEmpty = true;
 				break;
 			}
 		}
