@@ -258,6 +258,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				// To select the insertion point
 				to = -1 - to;
 			} else {
+				// Because binarySearch returns the exact index if element exists
 				to++;
 			}
 			LOG.info("Final To value of current dimension array: " + to);
@@ -275,11 +276,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 		}
 		LOG.info("Extracting words for set bits");
-		int nextBit = 0;
 
 		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
 			// operate on index i here
-			nearbyWords.add(gWordArr[nextBit]);
+			nearbyWords.add(gWordArr[i]);
 			if (i == Integer.MAX_VALUE) {
 				break; // or (i+1) would overflow
 			}
