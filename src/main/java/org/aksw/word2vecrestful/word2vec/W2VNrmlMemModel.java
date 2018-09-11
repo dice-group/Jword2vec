@@ -260,13 +260,16 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
+			tl.logTime(8);
 			int from = Arrays.binarySearch(dimsnValArr, minVal);
 			// LOG.info("From value of dimension array: " + from);
 			if (from < 0) {
 				// To select the insertion point
 				from = -1 - from;
 			}
+			tl.printTime(8, "Binary Search From");
 			// LOG.info("Final From value of current dimension array: " + from);
+			tl.logTime(9);
 			int to = Arrays.binarySearch(dimsnValArr, maxVal);
 			// LOG.info("To value of dimension array: " + to);
 			if (to < 0) {
@@ -276,6 +279,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				// Because binarySearch returns the exact index if element exists
 				to++;
 			}
+			tl.printTime(9, "Binary Search To");
 			// LOG.info("Final To value of current dimension array: " + to);
 			// LOG.info("Setting bits for the words between 'from' and 'to' indexes");
 			for (int j = from; j < to; j++) {
