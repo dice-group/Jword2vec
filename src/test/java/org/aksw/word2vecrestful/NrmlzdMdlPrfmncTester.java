@@ -12,6 +12,7 @@ import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
+import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 import org.junit.Test;
 
 import nikit.test.TestConst;
@@ -28,25 +29,31 @@ public class NrmlzdMdlPrfmncTester {
 		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<String> correctWords = getCorrectWords(centroids, nbm);
+		LOG.info("Correct Words are :" + correctWords);
 		int kStrt = 1;
 		int kEnd = 100;
 		int sigStrt = 1;
 		int sigEnd = 5;
 		int arDivStrt = 1;
 		int arDivEnd = 200;
-		int count = 1;
+		int indx = 0;
+		float[] percScore = new float[(kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1)];
+		int[] idArr = new int[percScore.length];
 		final W2VNrmlMemModelIndxdLR memModel = new W2VNrmlMemModelIndxdLR(nbm.word2vec, nbm.vectorSize);
 		for (int a = kStrt; a <= kEnd; a++) {
 			for (int b = arDivStrt; b <= arDivEnd; b++) {
 				for (int c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
 					List<String> lrModelWords = runLRMemModel(centroids, memModel, a, b, c);
-					LOG.info("Percentage Score for Test " + (count++) + " is"
-							+ calcPercScore(correctWords, lrModelWords));
+					float percVal = calcPercScore(correctWords, lrModelWords);
+					idArr[indx] = indx + 1;
+					percScore[indx] = percVal;
+					LOG.info("Percentage Score for Test id: " + (++indx) + " is" + percVal);
 				}
 			}
 		}
-
+		AssociativeSort.quickSort(percScore, idArr);
+		LOG.info("Highest Score is achieved by the test id: " + idArr[idArr.length - 1]);
 	}
 
 	private float calcPercScore(List<String> correctWords, List<String> lrModelWords) {

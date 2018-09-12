@@ -268,7 +268,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 				// Because binarySearch returns the exact index if element exists
 				to++;
 			}
-			LOG.info("Setting scores for the words between 'from' and 'to' indexes:\t" + from + " " + to);
+			// LOG.info("Setting scores for the words between 'from' and 'to' indexes:\t" + from + " " + to);
 			// tl.logTime(9);
 			for (int j = from; j < to; j++) {
 				scoreArr[idArr[j]]++;
