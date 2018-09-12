@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Cfg;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModel;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelNonIndxd;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -52,7 +52,7 @@ public class NormalizedInMemModelTest {
 	@Test
 	public void testNbmTime() {
 		LOG.info("Starting InMemory indexed model test!");
-		final W2VNrmlMemModel memModel = Word2VecFactory.getNormalizedBinModel();
+		final W2VNrmlMemModelNonIndxd memModel = Word2VecFactory.getNormalizedBinNonIndxdModel();
 		float[][] centroids = {TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5};
 		
 		long startTime, diff;

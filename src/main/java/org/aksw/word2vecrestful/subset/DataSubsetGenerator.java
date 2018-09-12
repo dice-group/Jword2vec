@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.aksw.word2vecrestful.utils.Cfg;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModel;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelNonIndxd;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 
@@ -139,7 +139,7 @@ public class DataSubsetGenerator {
 	 */
 	public static void main(String[] args) throws JsonProcessingException, FileNotFoundException, IOException {
 		File subsetConfig = new File("D:\\Nikit\\DICE-Group\\word2vec-dump\\subsetconfig2.json");
-		W2VNrmlMemModel model = Word2VecFactory.getNormalizedBinModel();
+		W2VNrmlMemModelNonIndxd model = Word2VecFactory.getNormalizedBinNonIndxdModel();
 		generateSubsetFiles(subsetConfig, Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir"),
 				model.getWord2VecMap(), model.getVectorSize());
 	}

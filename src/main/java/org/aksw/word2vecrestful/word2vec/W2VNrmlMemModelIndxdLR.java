@@ -1,10 +1,10 @@
 package org.aksw.word2vecrestful.word2vec;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.BitSet;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -24,24 +24,20 @@ import nikit.test.TimeLogger;
  * @author Nikit
  *
  */
-public class W2VNrmlMemModel implements GenWord2VecModel {
+public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	private Map<String, float[]> word2vec;
 	private int vectorSize;
 	private float[] sdArr;
 	/**
-	 * Limit to the multiplier of area in which nearby vectors are to be looked
-	 */
-	private static final int EXHAUSTION_MULT = 20;
-	/**
 	 * Multiplier for the standard deviation
 	 */
-	private static final int SIGMA_MULT = 3;
+	private int sigmaMult = 3;
 	/**
 	 * Divisor for the standard deviation's value
 	 */
-	private static final int AREA_DIVISOR = 20;
+	private int areaDivisor = 10;
 	private DataSubsetProvider dataSubsetProvider;
 	/**
 	 * Contains the sorted dimensional values mapped to their words
@@ -54,7 +50,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
 
-	public W2VNrmlMemModel(final Map<String, float[]> word2vec, final int vectorSize) {
+	public W2VNrmlMemModelIndxdLR(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
 		this.dataSubsetProvider = new DataSubsetProvider();
@@ -67,6 +63,33 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 		// Sort the indexes
 		this.sortIndexes();
 		// LOG.info("Sorting completed");
+	}
+
+	public W2VNrmlMemModelIndxdLR(final Map<String, float[]> word2vec, final int vectorSize, int sigmaMult,
+			int areaDivisor) {
+		this.word2vec = word2vec;
+		this.vectorSize = vectorSize;
+		this.sigmaMult = sigmaMult;
+		this.areaDivisor = areaDivisor;
+		this.dataSubsetProvider = new DataSubsetProvider();
+		this.initArrays();
+		// Calculate sd*3/10 and save in map
+		// Initialize indexesArr unsorted
+		// LOG.info("Initializing indexes and calculating standard deviation");
+		this.setModelVals(word2vec, vectorSize);
+		// LOG.info("Sorting indexes");
+		// Sort the indexes
+		this.sortIndexes();
+		// LOG.info("Sorting completed");
+	}
+
+	public void updateSdArr(int newSigmaMult, int newAreaDivisor) {
+		// Updating SdArr values
+		for(int i=0;i< sdArr.length;i++) {
+			sdArr[i] *= (areaDivisor/sigmaMult)*(newSigmaMult/newAreaDivisor);
+		}
+		this.sigmaMult = newSigmaMult;
+		this.areaDivisor = newAreaDivisor;
 	}
 
 	private void initArrays() {
@@ -137,7 +160,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			// LOG.info("fetching nearby vectors");
 			// Find nearby vectors
 			tl.logTime(2);
-			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet, true);
+			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet);
 			tl.printTime(2, "fetchNearbyVectors");
 			// LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
@@ -161,7 +184,7 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 *            - size of each vector
 	 */
 	public void setModelVals(Map<String, float[]> word2vecMap, int vectorSize) {
-		float[] resMap = new float[vectorSize];
+		float[] resArr = new float[vectorSize];
 		int totSize = word2vecMap.size();
 		// loop all dimensions
 		for (int i = 0; i < vectorSize; i++) {
@@ -189,10 +212,10 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			}
 			float variance = sum / dimsnArr.length;
 			Double sd = Math.sqrt(variance);
-			resMap[i] = sd.floatValue() * SIGMA_MULT / AREA_DIVISOR;
+			resArr[i] = sd.floatValue() * sigmaMult / areaDivisor;
 		}
 		// Set as sdMap
-		this.sdArr = resMap;
+		this.sdArr = resArr;
 	}
 
 	/**
@@ -204,63 +227,22 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 	 *            - word set to look into for nearby vectors
 	 * @return - mapping of nearby words alongwith with their vector values
 	 */
-	private Map<String, float[]> fetchNearbyVectors(float[] vector, Set<String> wordSet, boolean indxd) {
+	private Map<String, float[]> fetchNearbyVectors(float[] vector, Set<String> wordSet) {
 		Map<String, float[]> nearbyVecMap = new HashMap<>();
-		boolean mapEmpty = true;
-		boolean notExhausted = true;
 		float[][] minMaxVec = getMinMaxVec(vector);
-		int mult = 1;
-		while (mapEmpty && notExhausted) {
-			if (mult > 1) {
-				tl.logTime(8);
-				incrementMinMaxVec(minMaxVec);
-				tl.printTime(8, "incrementMinMaxVec");
-			}
-			tl.printTime(2, "getMinMaxVec");
-			if (indxd) {
-				tl.logTime(4);
-				putNearbyVecsIndxd(minMaxVec, wordSet, nearbyVecMap);
-				tl.printTime(4, "putNearbyVecsIndxd");
-			} else {
-				putNearbyVecsNonIndxd(minMaxVec, wordSet, nearbyVecMap);
-			}
-			if (nearbyVecMap.size() > 0) {
-				mapEmpty = false;
-			} else {
-				++mult;
-				if (mult > EXHAUSTION_MULT) {
-					notExhausted = false;
-				}
-				// LOG.info("MinMax multiplier incremented to " + mult);
-			}
-		}
+		putNearbyVecs(minMaxVec, nearbyVecMap);
 		return nearbyVecMap;
 	}
 
-	private void putNearbyVecsNonIndxd(float[][] minMaxVec, Set<String> wordSet, Map<String, float[]> nearbyVecMap) {
-		for (String word : wordSet) {
-			float[] entryVec = word2vec.get(word);
-			if (isVectorInArea(entryVec, minMaxVec)) {
-				nearbyVecMap.put(word, entryVec);
-			}
-		}
-	}
-
-	private void putNearbyVecsIndxd(float[][] minMaxVec, Set<String> wordSet, Map<String, float[]> nearbyVecMap) {
-		// init a set to hold words
-		Set<String> nearbyWords = new HashSet<>();
+	private void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
+		// init score array
+		short[] scoreArr = new short[gWordArr.length];
 		float[] minVec = minMaxVec[0];
 		float[] maxVec = minMaxVec[1];
-		BitSet finBitSet = null;
-		BitSet tempBitSet;
-		tl.logTime(5);
-		for (int i = 0; i < vectorSize; i++) {
-			tempBitSet = new BitSet(word2vec.size());
-			// LOG.info("Searching inside dimension " + (i) + "'s index");
+		// loop through each dimension and increment the score of words in that area
+		for(int i=0;i<vectorSize;i++) {
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
-			// LOG.info("MinVal and MaxVal for the current dimension: " + minVal + " " +
-			// maxVal);
 			Object[] entryArr = indexesArr[i];
 			int[] idArr = (int[]) entryArr[0];
 			float[] dimsnValArr = (float[]) entryArr[1];
@@ -280,67 +262,32 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 				// Because binarySearch returns the exact index if element exists
 				to++;
 			}
-			// LOG.info("Final To value of current dimension array: " + to);
-			LOG.info("Setting bits for the words between 'from' and 'to' indexes:\t"+from+" "+to);
+			LOG.info("Setting scores for the words between 'from' and 'to' indexes:\t" + from + " " + to);
 			tl.logTime(9);
 			for (int j = from; j < to; j++) {
-				tempBitSet.set(idArr[j], true);
+				scoreArr[idArr[j]]++;
 			}
-			tl.printTime(9, "Setting bits for index"+i);
-			if (i == 0) {
-				finBitSet = tempBitSet;
-			} else {
-				finBitSet.and(tempBitSet);
-			}
-			if (finBitSet.isEmpty()) {
-				// LOG.info("Word not found in the current min-max area.");
-				break;
-			}
+			tl.printTime(9, "Score set for index " + i);
 		}
-		// LOG.info("Extracting words for set bits");
-		tl.printTime(5, "Setting Bitset");
-		tl.logTime(6);
-		for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
-			// operate on index i here
-			nearbyWords.add(gWordArr[i]);
-			if (i == Integer.MAX_VALUE) {
-				break; // or (i+1) would overflow
-			}
-		}
-		tl.printTime(6, "extracting words");
-		// LOG.info("Nearby words size before retainAll from wordset: " +
-		// nearbyWords.size());
-		// Clear all the words not in wordset
-		tl.logTime(7);
-		nearbyWords.retainAll(wordSet);
-		tl.printTime(7, "retaining words");
-		// LOG.info("Nearby words size after retainAll from wordset: " +
-		// nearbyWords.size());
-		for (String word : nearbyWords) {
-			nearbyVecMap.put(word, word2vec.get(word));
+		// find the index of the words with highest score and add them to nearbyVecMap
+		for(Integer wordId : getMaxIdList(scoreArr)) {
+			nearbyVecMap.put(gWordArr[wordId], gVecArr[wordId]);
 		}
 	}
-
-	/**
-	 * Method to check if vector falls in a particular area
-	 * 
-	 * @param entryVec
-	 *            - vector to be verified
-	 * @param minMaxVec
-	 *            - min vec and max vec as area's boundary
-	 * @return - if the given vector is inside min and max vec's range
-	 */
-	private boolean isVectorInArea(float[] entryVec, float[][] minMaxVec) {
-		boolean isValid = true;
-		float[] minVec = minMaxVec[0];
-		float[] maxVec = minMaxVec[1];
-		for (int i = 0; i < entryVec.length; i++) {
-			if (entryVec[i] < minVec[i] || entryVec[i] > maxVec[i]) {
-				isValid = false;
-				break;
+	
+	private List<Integer> getMaxIdList(short[] scoreArr){
+		List<Integer> resList= new ArrayList<>();
+		short max = 0;
+		for(int i=0;i<scoreArr.length;i++) {
+			short score = scoreArr[i];
+			if(score>max) {
+				resList.clear();
+				resList.add(i);
+			} else if(score == max) {
+				resList.add(i);
 			}
 		}
-		return isValid;
+		return resList;
 	}
 
 	/**
@@ -362,18 +309,6 @@ public class W2VNrmlMemModel implements GenWord2VecModel {
 			resVec[1][i] = vector[i] + diff;
 		}
 		return resVec;
-	}
-
-	private void incrementMinMaxVec(float[][] minMaxVec) {
-		float[] minVec = minMaxVec[0];
-		float[] maxVec = minMaxVec[1];
-		for (int i = 0; i < vectorSize; i++) {
-			float diff = sdArr[i];
-			// MinVec
-			minVec[i] -= diff;
-			// MaxVec
-			maxVec[i] += diff;
-		}
 	}
 
 	private void sortIndexes() {
