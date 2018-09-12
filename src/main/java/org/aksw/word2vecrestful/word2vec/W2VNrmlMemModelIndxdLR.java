@@ -1,10 +1,8 @@
 package org.aksw.word2vecrestful.word2vec;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -13,6 +11,7 @@ import org.aksw.word2vecrestful.subset.DataSubsetProvider;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.dice_research.topicmodeling.commons.collections.TopShortIntCollection;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
 import nikit.test.TimeLogger;
@@ -38,6 +37,10 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 * Divisor for the standard deviation's value
 	 */
 	private int areaDivisor = 10;
+	/**
+	 * Number of top elements to give priority
+	 */
+	private int k = 10;
 	private DataSubsetProvider dataSubsetProvider;
 	/**
 	 * Contains the sorted dimensional values mapped to their words
@@ -84,9 +87,12 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	}
 
 	public void updateSdArr(int newSigmaMult, int newAreaDivisor) {
+		if (newSigmaMult == sigmaMult && newAreaDivisor == areaDivisor) {
+			return;
+		}
 		// Updating SdArr values
-		for(int i=0;i< sdArr.length;i++) {
-			sdArr[i] *= (areaDivisor/sigmaMult)*(newSigmaMult/newAreaDivisor);
+		for (int i = 0; i < sdArr.length; i++) {
+			sdArr[i] *= (areaDivisor / sigmaMult) * (newSigmaMult / newAreaDivisor);
 		}
 		this.sigmaMult = newSigmaMult;
 		this.areaDivisor = newAreaDivisor;
@@ -150,23 +156,23 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 			if (subKey == null) {
 				wordSet = word2vec.keySet();
 			} else {
-				tl.logTime(1);
+				// tl.logTime(1);
 				wordSet = dataSubsetProvider.fetchSubsetWords(subKey);
-				tl.printTime(1, "fetchSubsetWords");
+				// tl.printTime(1, "fetchSubsetWords");
 			}
 			// LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
 			// LOG.info("fetching nearby vectors");
 			// Find nearby vectors
-			tl.logTime(2);
+			// tl.logTime(2);
 			Map<String, float[]> nearbyVecs = fetchNearbyVectors(vector, wordSet);
-			tl.printTime(2, "fetchNearbyVectors");
+			// tl.printTime(2, "fetchNearbyVectors");
 			// LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
-			tl.logTime(3);
+			// tl.logTime(3);
 			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
-			tl.printTime(3, "findClosestVecInNearbyVecs");
+			// tl.printTime(3, "findClosestVecInNearbyVecs");
 		} catch (IOException e) {
 			// LOG.error(e.getStackTrace());
 		}
@@ -240,7 +246,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		float[] minVec = minMaxVec[0];
 		float[] maxVec = minMaxVec[1];
 		// loop through each dimension and increment the score of words in that area
-		for(int i=0;i<vectorSize;i++) {
+		for (int i = 0; i < vectorSize; i++) {
 			float minVal = minVec[i];
 			float maxVal = maxVec[i];
 			Object[] entryArr = indexesArr[i];
@@ -263,31 +269,25 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 				to++;
 			}
 			LOG.info("Setting scores for the words between 'from' and 'to' indexes:\t" + from + " " + to);
-			tl.logTime(9);
+			// tl.logTime(9);
 			for (int j = from; j < to; j++) {
 				scoreArr[idArr[j]]++;
 			}
-			tl.printTime(9, "Score set for index " + i);
+			// tl.printTime(9, "Score set for index " + i);
 		}
 		// find the index of the words with highest score and add them to nearbyVecMap
-		for(Integer wordId : getMaxIdList(scoreArr)) {
+		for (int wordId : getMaxIdList(scoreArr)) {
 			nearbyVecMap.put(gWordArr[wordId], gVecArr[wordId]);
 		}
 	}
-	
-	private List<Integer> getMaxIdList(short[] scoreArr){
-		List<Integer> resList= new ArrayList<>();
-		short max = 0;
-		for(int i=0;i<scoreArr.length;i++) {
+
+	private int[] getMaxIdList(short[] scoreArr) {
+		TopShortIntCollection collection = new TopShortIntCollection(k, false);
+		for (int i = 0; i < scoreArr.length; i++) {
 			short score = scoreArr[i];
-			if(score>max) {
-				resList.clear();
-				resList.add(i);
-			} else if(score == max) {
-				resList.add(i);
-			}
+			collection.add(score, i);
 		}
-		return resList;
+		return collection.getObjects();
 	}
 
 	/**
@@ -339,6 +339,14 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 */
 	public Map<String, float[]> getWord2VecMap() {
 		return this.word2vec;
+	}
+
+	public int getK() {
+		return k;
+	}
+
+	public void setK(int k) {
+		this.k = k;
 	}
 
 }
