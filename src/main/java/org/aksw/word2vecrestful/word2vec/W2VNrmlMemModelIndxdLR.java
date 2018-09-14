@@ -192,6 +192,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 */
 	public void setModelVals(Map<String, float[]> word2vecMap, int vectorSize) {
 		float[] resArr = new float[vectorSize];
+		float mult = sigmaMult / areaDivisor;
 		int totSize = word2vecMap.size();
 		// loop all dimensions
 		for (int i = 0; i < vectorSize; i++) {
@@ -219,7 +220,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 			}
 			float variance = sum / dimsnArr.length;
 			Double sd = Math.sqrt(variance);
-			resArr[i] = sd.floatValue() * sigmaMult / areaDivisor;
+			resArr[i] = sd.floatValue() * mult;
 		}
 		// Set as sdMap
 		this.sdArr = resArr;
