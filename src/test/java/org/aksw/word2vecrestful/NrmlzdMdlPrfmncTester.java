@@ -30,10 +30,10 @@ public class NrmlzdMdlPrfmncTester {
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
-		int kStrt = 100;
-		int kEnd = 250;
+		int kStrt = 1000;
+		int kEnd = 1050;
 		int sigStrt = 3;
-		int sigEnd = 5;
+		int sigEnd = 8;
 		int arDivStrt = 1;
 		int arDivEnd = 10;
 		int indx = 0;

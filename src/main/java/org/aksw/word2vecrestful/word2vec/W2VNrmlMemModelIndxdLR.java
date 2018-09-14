@@ -90,9 +90,10 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		if (newSigmaMult == sigmaMult && newAreaDivisor == areaDivisor) {
 			return;
 		}
+		float mult = (areaDivisor / sigmaMult) * (newSigmaMult / newAreaDivisor);
 		// Updating SdArr values
 		for (int i = 0; i < sdArr.length; i++) {
-			sdArr[i] *= (areaDivisor / sigmaMult) * (newSigmaMult / newAreaDivisor);
+			sdArr[i] *= mult;
 		}
 		this.sigmaMult = newSigmaMult;
 		this.areaDivisor = newAreaDivisor;
