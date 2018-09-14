@@ -30,12 +30,12 @@ public class NrmlzdMdlPrfmncTester {
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
-		int kStrt = 1;
-		int kEnd = 100;
-		int sigStrt = 1;
+		int kStrt = 100;
+		int kEnd = 250;
+		int sigStrt = 3;
 		int sigEnd = 5;
 		int arDivStrt = 1;
-		int arDivEnd = 200;
+		int arDivEnd = 10;
 		int indx = 0;
 		float[] percScore = new float[(kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1)];
 		int[] idArr = new int[percScore.length];
@@ -45,6 +45,7 @@ public class NrmlzdMdlPrfmncTester {
 				for (int c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
 					List<String> lrModelWords = runLRMemModel(centroids, memModel, a, b, c);
+					LOG.info("Predicted Words are :" + correctWords);
 					float percVal = calcPercScore(correctWords, lrModelWords);
 					idArr[indx] = indx + 1;
 					percScore[indx] = percVal;
@@ -53,7 +54,7 @@ public class NrmlzdMdlPrfmncTester {
 			}
 		}
 		AssociativeSort.quickSort(percScore, idArr);
-		LOG.info("Highest Score is achieved by the test id: " + idArr[idArr.length - 1]);
+		LOG.info("Highest Score ("+percScore[percScore.length-1]+"%) is achieved by the test id: " + idArr[idArr.length - 1]);
 	}
 
 	private float calcPercScore(List<String> correctWords, List<String> lrModelWords) {
