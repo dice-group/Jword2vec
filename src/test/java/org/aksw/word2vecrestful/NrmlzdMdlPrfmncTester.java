@@ -32,11 +32,11 @@ public class NrmlzdMdlPrfmncTester {
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
-		int kStrt = 1;
-		int kEnd = 10;
+		int kStrt = 1000;
+		int kEnd = 1050;
 		float sigStrt = 1;
 		float sigEnd = 5;
-		float arDivStrt = 1;
+		float arDivStrt = 90;
 		float arDivEnd = 100;
 		int indx = 0;
 		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
