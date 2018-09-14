@@ -32,11 +32,11 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	/**
 	 * Multiplier for the standard deviation
 	 */
-	private int sigmaMult = 3;
+	private float sigmaMult = 3;
 	/**
 	 * Divisor for the standard deviation's value
 	 */
-	private int areaDivisor = 10;
+	private float areaDivisor = 10;
 	/**
 	 * Number of top elements to give priority
 	 */
@@ -86,7 +86,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		// LOG.info("Sorting completed");
 	}
 
-	public void updateSdArr(int newSigmaMult, int newAreaDivisor) {
+	public void updateSdArr(float newSigmaMult, float newAreaDivisor) {
 		if (newSigmaMult == sigmaMult && newAreaDivisor == areaDivisor) {
 			return;
 		}

@@ -1,10 +1,12 @@
 package org.aksw.word2vecrestful;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Cfg;
+import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelIndxdLR;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
@@ -32,29 +34,31 @@ public class NrmlzdMdlPrfmncTester {
 		LOG.info("Correct Words are :" + correctWords);
 		int kStrt = 1000;
 		int kEnd = 1050;
-		int sigStrt = 3;
-		int sigEnd = 8;
-		int arDivStrt = 1;
-		int arDivEnd = 10;
+		float sigStrt = 3;
+		float sigEnd = 8;
+		float arDivStrt = 1;
+		float arDivEnd = 10;
 		int indx = 0;
-		float[] percScore = new float[(kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1)];
+		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
+		float[] percScore = new float[scrSize];
 		int[] idArr = new int[percScore.length];
 		final W2VNrmlMemModelIndxdLR memModel = new W2VNrmlMemModelIndxdLR(nbm.word2vec, nbm.vectorSize);
 		for (int a = kStrt; a <= kEnd; a++) {
-			for (int b = arDivStrt; b <= arDivEnd; b++) {
-				for (int c = sigStrt; c <= sigEnd; c++) {
+			for (float b = arDivStrt; b <= arDivEnd; b++) {
+				for (float c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
 					List<String> lrModelWords = runLRMemModel(centroids, memModel, a, b, c);
 					LOG.info("Predicted Words are :" + lrModelWords);
 					float percVal = calcPercScore(correctWords, lrModelWords);
 					idArr[indx] = indx + 1;
 					percScore[indx] = percVal;
-					LOG.info("Percentage Score for Test id: " + (++indx) + " is" + percVal);
+					LOG.info("Score for Test id: " + (++indx) + " is " + percVal + "%");
 				}
 			}
 		}
 		AssociativeSort.quickSort(percScore, idArr);
-		LOG.info("Highest Score ("+percScore[percScore.length-1]+"%) is achieved by the test id: " + idArr[idArr.length - 1]);
+		LOG.info("Highest Score (" + percScore[percScore.length - 1] + "%) is achieved by the test id: "
+				+ idArr[idArr.length - 1]);
 	}
 
 	private float calcPercScore(List<String> correctWords, List<String> lrModelWords) {
@@ -70,8 +74,8 @@ public class NrmlzdMdlPrfmncTester {
 
 	}
 
-	private List<String> runLRMemModel(float[][] centroids, W2VNrmlMemModelIndxdLR memModel, int k, int arDiv,
-			int sigMult) {
+	private List<String> runLRMemModel(float[][] centroids, W2VNrmlMemModelIndxdLR memModel, int k, float arDiv,
+			float sigMult) {
 		memModel.setK(k);
 		memModel.updateSdArr(sigMult, arDiv);
 		List<String> wordSet = new ArrayList<>();
@@ -109,4 +113,14 @@ public class NrmlzdMdlPrfmncTester {
 		LOG.info("Average query time for BruteForce is : " + (totTime / centroids.length) + " milliseconds");
 		return wordSet;
 	}
+
+	public static void main(String[] args) {
+		// Normalization test
+		float[] vecA = { 0.012048473f, -0.024212155f, -0.0157357f, 0.02262468f, -0.024654279f };
+		for (int i = 0; i < 100; i++) {
+			Word2VecMath.normalize(vecA);
+			System.out.println(Arrays.toString(vecA));
+		}
+	}
+
 }
