@@ -45,7 +45,7 @@ public class NrmlzdMdlPrfmncTester {
 				for (int c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
 					List<String> lrModelWords = runLRMemModel(centroids, memModel, a, b, c);
-					LOG.info("Predicted Words are :" + correctWords);
+					LOG.info("Predicted Words are :" + lrModelWords);
 					float percVal = calcPercScore(correctWords, lrModelWords);
 					idArr[indx] = indx + 1;
 					percScore[indx] = percVal;
