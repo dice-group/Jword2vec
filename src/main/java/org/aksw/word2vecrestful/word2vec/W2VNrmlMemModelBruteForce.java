@@ -102,9 +102,15 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 				i++;
 			}
 			cosineArr = AssociativeSort.quickSort(cosineArr, idArr);
-			int closestWordId = idArr[idArr.length - 1];
-			String closestWord = wordArr[closestWordId];
-			closestVec.put(closestWord, word2vec.get(closestWord));
+			double maxVal = cosineArr[cosineArr.length - 1];
+			for (int j = cosineArr.length - 1; j >= 0; j--) {
+				if (cosineArr[j] == maxVal) {
+					int closestWordId = idArr[j];
+					String closestWord = wordArr[closestWordId];
+					closestVec.put(closestWord, word2vec.get(closestWord));
+				}
+			}
+
 		} catch (IOException e) {
 			LOG.error(e.getStackTrace());
 		}
