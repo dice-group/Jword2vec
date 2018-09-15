@@ -1,10 +1,12 @@
 package org.aksw.word2vecrestful;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
@@ -116,12 +118,20 @@ public class NrmlzdMdlPrfmncTester {
 	}
 
 	public static void main(String[] args) {
-		// Normalization test
-		float[] vecA = { 0.012048473f, -0.024212155f, -0.0157357f, 0.02262468f, -0.024654279f };
-		for (int i = 0; i < 100; i++) {
-			Word2VecMath.normalize(vecA);
-			System.out.println(Arrays.toString(vecA));
+		// Creating random coordinates
+		float[][] coordArr = new float[10][2];
+		ThreadLocalRandom rand = ThreadLocalRandom.current();
+		for (int i = 0; i < coordArr.length; i++) {
+			for (int j = 0; j < coordArr[i].length; j++) {
+				coordArr[i][j] = rand.nextFloat();
+			}
 		}
+		// Random coord created
+		System.out.println("Input Coords: "+Arrays.deepToString(coordArr));
+		for (int i = 0; i < coordArr.length; i++) {
+			Word2VecMath.normalize(coordArr[i]);
+		}
+		System.out.println("Normalized Coords: "+Arrays.deepToString(coordArr));
 	}
 
 }

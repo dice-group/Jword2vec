@@ -1,17 +1,16 @@
 package org.aksw.word2vecrestful.word2vec;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.aksw.word2vecrestful.subset.DataSubsetProvider;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
-
-import nikit.test.TimeLogger;
 
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform
@@ -20,19 +19,41 @@ import nikit.test.TimeLogger;
  * @author Nikit
  *
  */
-public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
+public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	private Map<String, float[]> word2vec;
 	private int vectorSize;
-	private DataSubsetProvider dataSubsetProvider;
-	// TODO : Remove this
-	private TimeLogger tl = new TimeLogger();
+	private Map<Integer, List<String>> cosineIndxMap;
+	private float[] comparisonVec = null;
+	private float gMultiplier = 10000;
 
-	public W2VNrmlMemModelBruteForce(final Map<String, float[]> word2vec, final int vectorSize) {
+	public W2VNrmlMemModelTheta(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
-		this.dataSubsetProvider = new DataSubsetProvider();
+		// Generating index bucket for degrees
+		generateCosineIndxMap();
+	}
+
+	private void generateCosineIndxMap() {
+		cosineIndxMap = new HashMap<>();
+		float[] curVec;
+		for (String word : word2vec.keySet()) {
+			curVec = word2vec.get(word);
+			if (comparisonVec == null) {
+				comparisonVec = curVec;
+			}
+
+			Long cosineIndx = Math
+					.round(Word2VecMath.cosineSimilarityNormalizedVecs(comparisonVec, curVec) * gMultiplier);
+			int intIndxVal = cosineIndx.intValue();
+			List<String> wordsBucket = cosineIndxMap.get(intIndxVal);
+			if (wordsBucket == null) {
+				wordsBucket = new ArrayList<>();
+				cosineIndxMap.put(intIndxVal, wordsBucket);
+			}
+			wordsBucket.add(word);
+		}
 	}
 
 	/**
@@ -75,49 +96,40 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
-		Set<String> wordSet = null;
-		Map<String, float[]> closestVec = new HashMap<>();
+		Map<String, float[]> closestVec= null;
 		try {
-			if (subKey == null) {
-				wordSet = word2vec.keySet();
-			} else {
-				tl.logTime(1);
-				wordSet = dataSubsetProvider.fetchSubsetWords(subKey);
-				tl.printTime(1, "fetchSubsetWords");
-			}
-			// LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
-			// LOG.info("fetching nearby vectors");
 			// calculate cosine similarity of all distances
-			String[] wordArr = new String[wordSet.size()];
-			int[] idArr = new int[wordSet.size()];
-			double[] cosineArr = new double[wordSet.size()];
-			int i = 0;
-			for (String word : wordSet) {
-				wordArr[i] = word;
-				idArr[i] = i;
-				float[] wordVec = word2vec.get(word);
-				cosineArr[i] = Word2VecMath.cosineSimilarity(wordVec, vector);
-				i++;
+			double cosSimMultVal = Word2VecMath.cosineSimilarity(comparisonVec, vector) * gMultiplier;
+			Double dMinIndx = Math.floor(cosSimMultVal);
+			Double dMaxIndx = Math.ceil(cosSimMultVal);
+			int minIndx = dMinIndx.intValue();
+			int maxIndx = dMaxIndx.intValue();
+			Set<String> nearbyWords = new HashSet<>();
+			List<String> minWordList = cosineIndxMap.get(minIndx);
+			if (minWordList != null) {
+				nearbyWords.addAll(minWordList);
 			}
-			cosineArr = AssociativeSort.quickSort(cosineArr, idArr);
-			double maxVal = cosineArr[cosineArr.length - 1];
-			for (int j = cosineArr.length - 1; j >= 0; j--) {
-				if (cosineArr[j] == maxVal) {
-					int closestWordId = idArr[j];
-					String closestWord = wordArr[closestWordId];
-					closestVec.put(closestWord, word2vec.get(closestWord));
-				}else {
-					break;
-				}
+			List<String> maxWordList = cosineIndxMap.get(maxIndx);
+			if (maxWordList != null) {
+				nearbyWords.addAll(maxWordList);
 			}
-
-		} catch (IOException e) {
+			Map<String, float[]> nearbyVecMap = createNearbyVecMap(nearbyWords);
+			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecMap, vector);
+		} catch (Exception e) {
 			LOG.error(e.getStackTrace());
 		}
 		// LOG.info("Closest word found is " + closestVec.keySet());
 		return closestVec;
+	}
+
+	private Map<String, float[]> createNearbyVecMap(Collection<String> wordCol) {
+		Map<String, float[]> vecMap = new HashMap<>();
+		for (String word : wordCol) {
+			vecMap.put(word, word2vec.get(word));
+		}
+		return vecMap;
 	}
 
 	/**

@@ -130,4 +130,11 @@ public class Word2VecMath {
 		}
 		return closestVec;
 	}
+  
+  public static double getAngDegrees(float[] vecA, float[] vecB) {
+	  double cosSim = cosineSimilarity(vecA, vecB);
+	  double radians = Math.acos(cosSim);
+	  double degrees = Math.toDegrees(radians);
+	  return degrees;
+  }
 }
