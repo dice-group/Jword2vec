@@ -101,7 +101,7 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
 			// calculate cosine similarity of all distances
-			double cosSimMultVal = Word2VecMath.cosineSimilarity(comparisonVec, vector) * gMultiplier;
+			double cosSimMultVal = Word2VecMath.cosineSimilarityNormalizedVecs(comparisonVec, vector) * gMultiplier;
 			Double dMinIndx = Math.floor(cosSimMultVal);
 			Double dMaxIndx = Math.ceil(cosSimMultVal);
 			int minIndx = dMinIndx.intValue();
@@ -116,11 +116,10 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 				nearbyWords.addAll(maxWordList);
 			}
 			Map<String, float[]> nearbyVecMap = createNearbyVecMap(nearbyWords);
-			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecMap, vector);
+			closestVec = Word2VecMath.findClosestNormalizedVec(nearbyVecMap, vector);
 		} catch (Exception e) {
 			LOG.error(e.getStackTrace());
 		}
-		// LOG.info("Closest word found is " + closestVec.keySet());
 		return closestVec;
 	}
 

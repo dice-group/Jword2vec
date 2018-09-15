@@ -98,7 +98,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 				wordArr[i] = word;
 				idArr[i] = i;
 				float[] wordVec = word2vec.get(word);
-				cosineArr[i] = Word2VecMath.cosineSimilarity(wordVec, vector);
+				cosineArr[i] = Word2VecMath.cosineSimilarityNormalizedVecs(wordVec, vector);
 				i++;
 			}
 			cosineArr = AssociativeSort.quickSort(cosineArr, idArr);

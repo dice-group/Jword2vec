@@ -2,7 +2,8 @@ package org.aksw.word2vecrestful.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TreeMap;
+
+import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
 public class Word2VecMath {
 
@@ -118,14 +119,20 @@ public class Word2VecMath {
 	  return res;
   }
   
-  public static Map<String, float[]> findClosestVecInNearbyVecs(Map<String, float[]> nearbyVecs, float[] vector) {
+  public static Map<String, float[]> findClosestNormalizedVec(Map<String, float[]> nearbyVecs, float[] vector) {
 		Map<String, float[]> closestVec = new HashMap<>();
+		String[] wordArr = new String[nearbyVecs.size()];
+		double[] cosineValArr = new double[nearbyVecs.size()];
 		if(nearbyVecs !=null && vector != null && nearbyVecs.size()>0) {
-			TreeMap<Double, String> cosineSimMap = new TreeMap<>();
+			int i=0;
 			for (String word : nearbyVecs.keySet()) {
-				cosineSimMap.put(Word2VecMath.cosineSimilarity(vector, nearbyVecs.get(word)), word);
+				cosineValArr[i] = Word2VecMath.cosineSimilarityNormalizedVecs(vector, nearbyVecs.get(word));
+				wordArr[i] = word;
+				i++;
 			}
-			String closestWord = cosineSimMap.lastEntry().getValue();
+			AssociativeSort.quickSort(cosineValArr, wordArr);
+			int maxIndx = cosineValArr.length -1;
+			String closestWord = wordArr[maxIndx];
 			closestVec.put(closestWord, nearbyVecs.get(closestWord));
 		}
 		return closestVec;

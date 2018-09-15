@@ -135,7 +135,7 @@ public class W2VNrmlMemModelNonIndxd implements GenWord2VecModel {
 			// LOG.info("found the following nearby words: " + nearbyVecs.keySet());
 			// Select the closest vector
 			tl.logTime(3);
-			closestVec = Word2VecMath.findClosestVecInNearbyVecs(nearbyVecs, vector);
+			closestVec = Word2VecMath.findClosestNormalizedVec(nearbyVecs, vector);
 			tl.printTime(3, "findClosestVecInNearbyVecs");
 		} catch (IOException e) {
 			// LOG.error(e.getStackTrace());
