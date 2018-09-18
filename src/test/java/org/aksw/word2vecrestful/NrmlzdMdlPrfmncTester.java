@@ -34,8 +34,8 @@ public class NrmlzdMdlPrfmncTester {
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
 
-		int kStrt = 100;
-		int kEnd = 100;//20;
+		int kStrt = 3000;
+		int kEnd = 4000;//20;
 		float sigStrt = 2;
 		float sigEnd = 3;
 		float arDivStrt = 10;
@@ -45,7 +45,7 @@ public class NrmlzdMdlPrfmncTester {
 		float[] percScore = new float[scrSize];
 		int[] idArr = new int[percScore.length];
 		final W2VNrmlMemModelIndxdLRMulti memModel = new W2VNrmlMemModelIndxdLRMulti(nbm.word2vec, nbm.vectorSize);
-		for (int a = kStrt; a <= kEnd; a+=10) {
+		for (int a = kStrt; a <= kEnd; a+=100) {
 			for (float b = arDivStrt; b <= arDivEnd; b++) {
 				for (float c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
