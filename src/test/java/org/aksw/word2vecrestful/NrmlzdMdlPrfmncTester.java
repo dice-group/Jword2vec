@@ -35,18 +35,18 @@ public class NrmlzdMdlPrfmncTester {
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<Set<String>> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
-		int kStrt = 1000;
-		int kEnd = 1000;//20;
+		int kStrt = 10000;
+		int kEnd = 12000;//20;
 		float sigStrt = 1;
 		float sigEnd = 5;
 		float arDivStrt = 1;
-        float arDivEnd = 1;//10;
+        float arDivEnd = 10;//10;
 		int indx = 0;
 		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
 		float[] percScore = new float[scrSize];
 		int[] idArr = new int[percScore.length];
 		final W2VNrmlMemModelIndxdLR memModel = new W2VNrmlMemModelIndxdLR(nbm.word2vec, nbm.vectorSize);
-		for (int a = kStrt; a <= kEnd; a++) {
+		for (int a = kStrt; a <= kEnd; a+=10) {
 			for (float b = arDivStrt; b <= arDivEnd; b++) {
 				for (float c = sigStrt; c <= sigEnd; c++) {
 					LOG.info("Starting LR-Model Test with config: kVal=" + a + " and sigMult=" + c + " and arDiv=" + b);
