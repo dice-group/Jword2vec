@@ -3,8 +3,6 @@ package org.aksw.word2vecrestful;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.aksw.word2vecrestful.utils.Cfg;
@@ -46,7 +44,7 @@ public class NrmlzdMdlPrfmncTester {
 		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
 		float[] percScore = new float[scrSize];
 		int[] idArr = new int[percScore.length];
-		final W2VNrmlMemModelIndxdLR memModel = new W2VNrmlMemModelIndxdLR(nbm.word2vec, nbm.vectorSize);
+		final W2VNrmlMemModelIndxdLRMulti memModel = new W2VNrmlMemModelIndxdLRMulti(nbm.word2vec, nbm.vectorSize);
 		for (int a = kStrt; a <= kEnd; a+=10) {
 			for (float b = arDivStrt; b <= arDivEnd; b++) {
 				for (float c = sigStrt; c <= sigEnd; c++) {
@@ -96,7 +94,7 @@ public class NrmlzdMdlPrfmncTester {
 		}
 
 		LOG.info(
-				"Average query time for W2VNrmlMemModelIndxdLR is : " + (totTime / centroids.length) + " milliseconds");
+				"Average query time for W2VNrmlMemModelIndxdLRMulti is : " + (totTime / centroids.length) + " milliseconds");
 		return wordSet;
 	}
 
