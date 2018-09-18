@@ -60,10 +60,10 @@ public class NormalizedInMemModelTest {
 		for (int i=0;i<centroids.length;i++) {
 			LOG.info("Sending query for Centroid " + (i+1) );
 			startTime = System.currentTimeMillis();
-			Map<String, float[]> closestWord = memModel.getClosestSubEntry( centroids[i], null);
+			String closestWord = memModel.getClosestSubEntry( centroids[i], null);
 			diff = System.currentTimeMillis() - startTime;
 			totTime += diff;
-			LOG.info(closestWord.keySet());
+			LOG.info(closestWord);
 			LOG.info("Query time recorded for Centroid " + (i+1) + " is "
 					+ diff + " milliseconds.");
 		}

@@ -45,7 +45,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestEntry(float[] vector) {
+	public String getClosestEntry(float[] vector) {
 		return getClosestEntry(vector, null);
 	}
 
@@ -60,7 +60,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestSubEntry(float[] vector, String subKey) {
+	public String getClosestSubEntry(float[] vector, String subKey) {
 		return getClosestEntry(vector, subKey);
 	}
 
@@ -74,9 +74,9 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 *            - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
-	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
+	private String getClosestEntry(float[] vector, String subKey) {
 		Set<String> wordSet = null;
-		Map<String, float[]> closestVec = new HashMap<>();
+		String closestVec = null;
 		try {
 			if (subKey == null) {
 				wordSet = word2vec.keySet();
@@ -107,7 +107,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 				if (cosineArr[j] == maxVal) {
 					int closestWordId = idArr[j];
 					String closestWord = wordArr[closestWordId];
-					closestVec.put(closestWord, word2vec.get(closestWord));
+					closestVec = closestWord;
 				}else {
 					break;
 				}
