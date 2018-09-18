@@ -38,18 +38,23 @@ public class NrmlzdThetaMdlPrfmncTester {
 		List<String> lrModelWords = new ArrayList<>();
 
 		LOG.info("Starting Theta-Model Test");
-		for (int i = 0; i < centroids.length; i++) {
-			LOG.info("Sending query for Centroid " + (i + 1));
-			startTime = System.currentTimeMillis();
-			lrModelWords.addAll(memModel.getClosestEntry(centroids[i]).keySet());
-			diff = System.currentTimeMillis() - startTime;
-			totTime += diff;
-			LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
+		for (int mult = 10; mult < 1000; mult += 10) {
+			memModel.updateGMultiplier(mult);
+			LOG.info("Testing with multplier: " + mult);
+			for (int i = 0; i < centroids.length; i++) {
+				LOG.info("Sending query for Centroid " + (i + 1));
+				startTime = System.currentTimeMillis();
+				lrModelWords.addAll(memModel.getClosestEntry(centroids[i]).keySet());
+				diff = System.currentTimeMillis() - startTime;
+				totTime += diff;
+				LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
+			}
+			LOG.info("Average query time for W2VNrmlMemModelTheta is : " + (totTime / centroids.length)
+					+ " milliseconds");
+			LOG.info("Predicted Words are :" + lrModelWords);
+			float percVal = calcPercScore(correctWords, lrModelWords);
+			LOG.info("Score for Test is : " + percVal + "%");
 		}
-		LOG.info("Average query time for W2VNrmlMemModelTheta is : " + (totTime / centroids.length) + " milliseconds");
-		LOG.info("Predicted Words are :" + lrModelWords);
-		float percVal = calcPercScore(correctWords, lrModelWords);
-		LOG.info("Score for Test is : " + percVal + "%");
 	}
 
 	private float calcPercScore(List<Set<String>> correctWordSet, List<String> lrModelWords) {
