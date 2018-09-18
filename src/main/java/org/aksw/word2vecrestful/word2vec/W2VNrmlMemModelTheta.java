@@ -26,7 +26,7 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	private int vectorSize;
 	private Map<Integer, List<String>> cosineIndxMap;
 	private float[] comparisonVec = null;
-	private float gMultiplier = 10000;
+	private float gMultiplier = 10;
 
 	public W2VNrmlMemModelTheta(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
@@ -35,6 +35,25 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 		setComparisonVec(word2vec, vectorSize);
 		// Generating index bucket for degrees
 		generateCosineIndxMap();
+		// TODO: Remove this
+		printBucketSize();
+	}
+
+	public void updateGMultiplier(float gMult) {
+		if (this.gMultiplier == gMult) {
+			return;
+		}
+		this.gMultiplier = gMult;
+		// Generating index bucket for degrees
+		generateCosineIndxMap();
+		// TODO: Remove this
+		printBucketSize();
+	}
+
+	private void printBucketSize() {
+		for (int i : cosineIndxMap.keySet()) {
+			LOG.info("Bucket " + i + " has the size: " + cosineIndxMap.get(i).size());
+		}
 	}
 
 	public void setComparisonVec(Map<String, float[]> word2vecMap, int vectorSize) {

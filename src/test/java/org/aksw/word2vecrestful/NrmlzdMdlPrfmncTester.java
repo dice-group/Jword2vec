@@ -35,12 +35,13 @@ public class NrmlzdMdlPrfmncTester {
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
+
 		int kStrt = 100;
 		int kEnd = 100;//20;
 		float sigStrt = 2;
 		float sigEnd = 3;
 		float arDivStrt = 10;
-        float arDivEnd = 10;//10;
+    float arDivEnd = 10;//10;
 		int indx = 0;
 		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
 		float[] percScore = new float[scrSize];
