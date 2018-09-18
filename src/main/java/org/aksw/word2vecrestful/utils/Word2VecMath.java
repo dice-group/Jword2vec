@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.dice_research.topicmodeling.commons.collections.TopDoubleObjectCollection;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
 public class Word2VecMath {

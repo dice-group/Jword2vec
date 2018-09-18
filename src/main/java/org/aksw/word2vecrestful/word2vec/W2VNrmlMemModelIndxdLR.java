@@ -27,7 +27,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	private Map<String, float[]> word2vec;
-	private int vectorSize;
+	protected int vectorSize;
 	private float[] sdArr;
     private float[] multSdArr;
 	/**
@@ -41,15 +41,15 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	/**
 	 * Number of top elements to give priority
 	 */
-	private int k = 10;
+	protected int k = 10;
 	private DataSubsetProvider dataSubsetProvider;
 	/**
 	 * Contains the sorted dimensional values mapped to their words
 	 */
-	private Object[][] indexesArr;
+	protected Object[][] indexesArr;
 
-	private String[] gWordArr;
-	private float[][] gVecArr;
+	protected String[] gWordArr;
+	protected float[][] gVecArr;
 
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
@@ -246,7 +246,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		return nearbyVecMap;
 	}
 
-	private void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
+	protected void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
 		// init score array
 		short[] scoreArr = new short[gWordArr.length];
 		float[] minVec = minMaxVec[0];
