@@ -25,6 +25,8 @@ public class NrmlzdThetaMdlPrfmncTester {
 
 	@Test
 	public void testNbmTime() {
+		long startTime, diff;
+		long totTime = 0;
 		LOG.info("Starting InMemory Theta Model test!");
 		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
 		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
@@ -34,10 +36,17 @@ public class NrmlzdThetaMdlPrfmncTester {
 		LOG.info("Initializing Theta Model");
 		final W2VNrmlMemModelTheta memModel = new W2VNrmlMemModelTheta(nbm.word2vec, nbm.vectorSize);
 		List<String> lrModelWords = new ArrayList<>();
+
 		LOG.info("Starting Theta-Model Test");
 		for (int i = 0; i < centroids.length; i++) {
+			LOG.info("Sending query for Centroid " + (i + 1));
+			startTime = System.currentTimeMillis();
 			lrModelWords.addAll(memModel.getClosestEntry(centroids[i]).keySet());
+			diff = System.currentTimeMillis() - startTime;
+			totTime += diff;
+			LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
 		}
+		LOG.info("Average query time for W2VNrmlMemModelTheta is : " + (totTime / centroids.length) + " milliseconds");
 		LOG.info("Predicted Words are :" + lrModelWords);
 		float percVal = calcPercScore(correctWords, lrModelWords);
 		LOG.info("Score for Test is : " + percVal + "%");
