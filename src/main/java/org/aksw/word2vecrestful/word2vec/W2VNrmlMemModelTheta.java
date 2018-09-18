@@ -31,8 +31,29 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	public W2VNrmlMemModelTheta(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
+		// Setting mean as comparison vec
+		setComparisonVec(word2vec, vectorSize);
 		// Generating index bucket for degrees
 		generateCosineIndxMap();
+	}
+
+	public void setComparisonVec(Map<String, float[]> word2vecMap, int vectorSize) {
+		float[] meanArr = new float[vectorSize];
+		int totSize = word2vecMap.size();
+		// loop all dimensions
+		for (int i = 0; i < vectorSize; i++) {
+			// loop through all the words
+			float[] dimsnArr = new float[totSize];
+			float sum = 0;
+			for (float[] vecEntry : word2vecMap.values()) {
+				float val = vecEntry[i];
+				sum += val;
+			}
+			// mean
+			float mean = sum / dimsnArr.length;
+			meanArr[i] = mean;
+		}
+		this.comparisonVec = meanArr;
 	}
 
 	private void generateCosineIndxMap() {
@@ -40,9 +61,6 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 		float[] curVec;
 		for (String word : word2vec.keySet()) {
 			curVec = word2vec.get(word);
-			if (comparisonVec == null) {
-				comparisonVec = curVec;
-			}
 
 			Long cosineIndx = Math
 					.round(Word2VecMath.cosineSimilarityNormalizedVecs(comparisonVec, curVec) * gMultiplier);
@@ -96,7 +114,7 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
-		Map<String, float[]> closestVec= null;
+		Map<String, float[]> closestVec = null;
 		try {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
