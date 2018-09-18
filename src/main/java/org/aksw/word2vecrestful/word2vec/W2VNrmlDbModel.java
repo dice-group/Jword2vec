@@ -25,13 +25,13 @@ public class W2VNrmlDbModel implements GenWord2VecModel{
 	}
 
 	@Override
-	public Map<String, float[]> getClosestEntry(float[] vector) {
+	public String getClosestEntry(float[] vector) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public Map<String, float[]> getClosestSubEntry(float[] vector, String subKey) {
+	public String getClosestSubEntry(float[] vector, String subKey) {
 		// TODO Auto-generated method stub
 		return null;
 	}

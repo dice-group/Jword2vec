@@ -27,7 +27,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
 	private Map<String, float[]> word2vec;
-	private int vectorSize;
+	protected int vectorSize;
 	private float[] sdArr;
     private float[] multSdArr;
 	/**
@@ -41,15 +41,15 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	/**
 	 * Number of top elements to give priority
 	 */
-	private int k = 10;
+	protected int k = 10;
 	private DataSubsetProvider dataSubsetProvider;
 	/**
 	 * Contains the sorted dimensional values mapped to their words
 	 */
-	private Object[][] indexesArr;
+	protected Object[][] indexesArr;
 
-	private String[] gWordArr;
-	private float[][] gVecArr;
+	protected String[] gWordArr;
+	protected float[][] gVecArr;
 
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
@@ -123,7 +123,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestEntry(float[] vector) {
+	public String getClosestEntry(float[] vector) {
 		return getClosestEntry(vector, null);
 	}
 
@@ -138,7 +138,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestSubEntry(float[] vector, String subKey) {
+	public String getClosestSubEntry(float[] vector, String subKey) {
 		return getClosestEntry(vector, subKey);
 	}
 
@@ -152,9 +152,9 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 *            - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
-	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
+	private String getClosestEntry(float[] vector, String subKey) {
 		Set<String> wordSet = null;
-		Map<String, float[]> closestVec = null;
+		String closestVec = null;
 		try {
 			if (subKey == null) {
 				wordSet = word2vec.keySet();
@@ -246,7 +246,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		return nearbyVecMap;
 	}
 
-	private void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
+	protected void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
 		// init score array
 		short[] scoreArr = new short[gWordArr.length];
 		float[] minVec = minMaxVec[0];

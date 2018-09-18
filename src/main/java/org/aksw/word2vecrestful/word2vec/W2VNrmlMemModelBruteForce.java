@@ -45,7 +45,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestEntry(float[] vector) {
+	public String getClosestEntry(float[] vector) {
 		return getClosestEntry(vector, null);
 	}
 
@@ -60,7 +60,7 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestSubEntry(float[] vector, String subKey) {
+	public String getClosestSubEntry(float[] vector, String subKey) {
 		return getClosestEntry(vector, subKey);
 	}
 
@@ -74,9 +74,9 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 	 *            - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
-	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
+	private String getClosestEntry(float[] vector, String subKey) {
 		Set<String> wordSet = null;
-		Map<String, float[]> closestVec = new HashMap<>();
+		String closestVec = null;
 		try {
 			if (subKey == null) {
 				wordSet = word2vec.keySet();
@@ -88,30 +88,32 @@ public class W2VNrmlMemModelBruteForce implements GenWord2VecModel {
 			// LOG.info("Normalizing input vector");
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
+			
+			return Word2VecMath.findClosestNormalizedVec(word2vec, vector);
 			// LOG.info("fetching nearby vectors");
 			// calculate cosine similarity of all distances
-			String[] wordArr = new String[wordSet.size()];
-			int[] idArr = new int[wordSet.size()];
-			double[] cosineArr = new double[wordSet.size()];
-			int i = 0;
-			for (String word : wordSet) {
-				wordArr[i] = word;
-				idArr[i] = i;
-				float[] wordVec = word2vec.get(word);
-				cosineArr[i] = Word2VecMath.cosineSimilarityNormalizedVecs(wordVec, vector);
-				i++;
-			}
-			cosineArr = AssociativeSort.quickSort(cosineArr, idArr);
-			double maxVal = cosineArr[cosineArr.length - 1];
-			for (int j = cosineArr.length - 1; j >= 0; j--) {
-				if (cosineArr[j] == maxVal) {
-					int closestWordId = idArr[j];
-					String closestWord = wordArr[closestWordId];
-					closestVec.put(closestWord, word2vec.get(closestWord));
-				}else {
-					break;
-				}
-			}
+//			String[] wordArr = new String[wordSet.size()];
+//			int[] idArr = new int[wordSet.size()];
+//			double[] cosineArr = new double[wordSet.size()];
+//			int i = 0;
+//			for (String word : wordSet) {
+//				wordArr[i] = word;
+//				idArr[i] = i;
+//				float[] wordVec = word2vec.get(word);
+//				cosineArr[i] = Word2VecMath.cosineSimilarityNormalizedVecs(wordVec, vector);
+//				i++;
+//			}
+//			cosineArr = AssociativeSort.quickSort(cosineArr, idArr);
+//			double maxVal = cosineArr[cosineArr.length - 1];
+//			for (int j = cosineArr.length - 1; j >= 0; j--) {
+//				if (cosineArr[j] == maxVal) {
+//					int closestWordId = idArr[j];
+//					String closestWord = wordArr[closestWordId];
+//					closestVec = closestWord;
+//				}else {
+//					break;
+//				}
+//			}
 
 		} catch (IOException e) {
 			LOG.error(e.getStackTrace());

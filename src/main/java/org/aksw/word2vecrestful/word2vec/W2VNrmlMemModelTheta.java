@@ -103,7 +103,7 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestEntry(float[] vector) {
+	public String getClosestEntry(float[] vector) {
 		return getClosestEntry(vector, null);
 	}
 
@@ -118,7 +118,7 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	@Override
-	public Map<String, float[]> getClosestSubEntry(float[] vector, String subKey) {
+	public String getClosestSubEntry(float[] vector, String subKey) {
 		return getClosestEntry(vector, subKey);
 	}
 
@@ -132,8 +132,8 @@ public class W2VNrmlMemModelTheta implements GenWord2VecModel {
 	 *            - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
-	private Map<String, float[]> getClosestEntry(float[] vector, String subKey) {
-		Map<String, float[]> closestVec = null;
+	private String getClosestEntry(float[] vector, String subKey) {
+	    String closestVec = null;
 		try {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
