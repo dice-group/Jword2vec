@@ -39,8 +39,9 @@ public class NrmlzdThetaMdlPrfmncTester {
 
 		LOG.info("Starting Theta-Model Test");
 		for (int mult = 10; mult < 1000; mult += 10) {
-			memModel.updateGMultiplier(mult);
 			LOG.info("Testing with multplier: " + mult);
+			memModel.updateGMultiplier(mult);
+			
 			for (int i = 0; i < centroids.length; i++) {
 				LOG.info("Sending query for Centroid " + (i + 1));
 				startTime = System.currentTimeMillis();
@@ -54,6 +55,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 			LOG.info("Predicted Words are :" + lrModelWords);
 			float percVal = calcPercScore(correctWords, lrModelWords);
 			LOG.info("Score for Test is : " + percVal + "%");
+			lrModelWords.clear();
 		}
 	}
 
