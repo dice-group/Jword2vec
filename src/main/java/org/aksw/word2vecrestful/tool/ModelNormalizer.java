@@ -34,7 +34,7 @@ public class ModelNormalizer {
 	 *            - size of the vector
 	 * @return - normalized line
 	 */
-	public String getNormalizedVecLine(String word, float[] vector) {
+	public static String getNormalizedVecLine(String word, float[] vector) {
 		StringBuffer resStr = new StringBuffer();
 		resStr.append(word);
 		vector = Word2VecMath.normalize(vector);
@@ -44,7 +44,7 @@ public class ModelNormalizer {
 		return resStr.toString();
 	}
 
-	public byte[] getNormalizedVecBA(float[] vector) {
+	public static byte[] getNormalizedVecBA(float[] vector) {
 		vector = Word2VecMath.normalize(vector);
 		ByteBuffer buffer = ByteBuffer.allocate(vector.length * 4);
 		buffer.order(ByteOrder.LITTLE_ENDIAN);

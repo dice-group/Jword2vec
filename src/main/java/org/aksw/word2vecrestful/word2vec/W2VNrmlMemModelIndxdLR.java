@@ -29,6 +29,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	private Map<String, float[]> word2vec;
 	private int vectorSize;
 	private float[] sdArr;
+    private float[] multSdArr;
 	/**
 	 * Multiplier for the standard deviation
 	 */
@@ -87,13 +88,14 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	}
 
 	public void updateSdArr(float newSigmaMult, float newAreaDivisor) {
-		if (newSigmaMult == sigmaMult && newAreaDivisor == areaDivisor) {
-			return;
-		}
-		float mult = (areaDivisor / sigmaMult) * (newSigmaMult / newAreaDivisor);
+//		if (newSigmaMult == sigmaMult && newAreaDivisor == areaDivisor) {
+//			return;
+//		}
+//		float mult = (areaDivisor / sigmaMult) * (newSigmaMult / newAreaDivisor);
+        float mult = (newSigmaMult / newAreaDivisor);
 		// Updating SdArr values
-		for (int i = 0; i < sdArr.length; i++) {
-			sdArr[i] *= mult;
+		for (int i = 0; i < multSdArr.length; i++) {
+		    multSdArr[i] = mult * sdArr[i];
 		}
 		this.sigmaMult = newSigmaMult;
 		this.areaDivisor = newAreaDivisor;
@@ -192,7 +194,6 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 	 */
 	public void setModelVals(Map<String, float[]> word2vecMap, int vectorSize) {
 		float[] resArr = new float[vectorSize];
-		float mult = sigmaMult / areaDivisor;
 		int totSize = word2vecMap.size();
 		// loop all dimensions
 		for (int i = 0; i < vectorSize; i++) {
@@ -220,10 +221,13 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 			}
 			float variance = sum / dimsnArr.length;
 			Double sd = Math.sqrt(variance);
-			resArr[i] = sd.floatValue() * mult;
+			resArr[i] = sd.floatValue();
 		}
 		// Set as sdMap
 		this.sdArr = resArr;
+        this.multSdArr = new float[sdArr.length];
+		// Apply the multiplicator
+		updateSdArr(sigmaMult, areaDivisor);
 	}
 
 	/**
@@ -304,7 +308,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 		float[][] resVec = new float[2][vector.length];
 		for (int i = 0; i < vector.length; i++) {
 			// TODO: change sdmap to array
-			float diff = sdArr[i];
+			float diff = multSdArr[i];
 			// MinVec
 			resVec[0][i] = vector[i] - diff;
 			// MaxVec
