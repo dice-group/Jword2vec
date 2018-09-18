@@ -2,6 +2,7 @@ package org.aksw.word2vecrestful.word2vec;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.stream.IntStream;
 
@@ -19,7 +20,11 @@ public class W2VNrmlMemModelIndxdLRMulti extends W2VNrmlMemModelIndxdLR {
 
     protected void putNearbyVecs(float[][] minMaxVec, Map<String, float[]> nearbyVecMap) {
         // init score array
-        AtomicIntegerArray scoreArr = new AtomicIntegerArray(gWordArr.length);
+//        AtomicIntegerArray scoreArr = new AtomicIntegerArray(gWordArr.length);
+        AtomicInteger scoreArr[] = new AtomicInteger[gWordArr.length];
+        for (int j = 0; j < scoreArr.length; j++) {
+            scoreArr[j] = new AtomicInteger();
+        }
         float[] minVec = minMaxVec[0];
         float[] maxVec = minMaxVec[1];
         // loop through each dimension and increment the score of words in that area
@@ -49,7 +54,7 @@ public class W2VNrmlMemModelIndxdLRMulti extends W2VNrmlMemModelIndxdLR {
             // from + " " + to);
             // tl.logTime(9);
             for (int j = from; j < to; j++) {
-                scoreArr.incrementAndGet(idArr[j]);
+                scoreArr[idArr[j]].incrementAndGet();
             }
             // tl.printTime(9, "Score set for index " + i);
         });
@@ -57,6 +62,14 @@ public class W2VNrmlMemModelIndxdLRMulti extends W2VNrmlMemModelIndxdLR {
         for (int wordId : getMaxIdList(scoreArr)) {
             nearbyVecMap.put(gWordArr[wordId], gVecArr[wordId]);
         }
+    }
+
+    private int[] getMaxIdList(AtomicInteger[] scoreArr) {
+        TopIntIntCollection collection = new TopIntIntCollection(k, false);
+        for (int i = 0; i < scoreArr.length; i++) {
+            collection.add(scoreArr[i].get(), i);
+        }
+        return collection.getObjects();
     }
 
     private int[] getMaxIdList(AtomicIntegerArray scoreArr) {
