@@ -200,7 +200,7 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 			// loop through all the words
 			float[] dimsnArr = new float[totSize];
 			int[] idArr = new int[totSize];
-			float sum = 0;
+			double sum = 0;
 			for (int j = 0; j < gWordArr.length; j++) {
 				float val = gVecArr[j][i];
 				sum += val;
@@ -214,12 +214,12 @@ public class W2VNrmlMemModelIndxdLR implements GenWord2VecModel {
 			this.indexesArr[i] = dimValWordMap;
 			// LOG.info("Dimension " + (i) + " index stored to memory");
 			// mean
-			float mean = sum / dimsnArr.length;
+			double mean = sum / dimsnArr.length;
 			sum = 0;
 			for (int j = 0; j < dimsnArr.length; j++) {
 				sum += Math.pow(dimsnArr[j] - mean, 2);
 			}
-			float variance = sum / dimsnArr.length;
+			double variance = sum / dimsnArr.length;
 			Double sd = Math.sqrt(variance);
 			resArr[i] = sd.floatValue();
 		}
