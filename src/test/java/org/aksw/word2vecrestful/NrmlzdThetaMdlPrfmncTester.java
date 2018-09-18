@@ -53,7 +53,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 			LOG.info("Average query time for W2VNrmlMemModelTheta is : " + (totTime / centroids.length)
 					+ " milliseconds");
 			LOG.info("Predicted Words are :" + lrModelWords);
-			float percVal = calcPercScore(correctWords, lrModelWords);
+			float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, lrModelWords);
 			LOG.info("Score for Test is : " + percVal + "%");
 			lrModelWords.clear();
 		}
