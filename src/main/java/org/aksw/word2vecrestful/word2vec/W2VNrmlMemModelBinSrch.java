@@ -28,7 +28,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private float[][] vecArr;
 	private int[] indxArr;
 	private double[] simValArr;
-	private int compareVecCount = 100;
+	private int compareVecCount = 200;
 	private int bucketCount = 10;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
