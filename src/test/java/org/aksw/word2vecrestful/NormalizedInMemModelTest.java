@@ -1,11 +1,14 @@
 package org.aksw.word2vecrestful;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelNonIndxd;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
+import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -49,7 +52,7 @@ public class NormalizedInMemModelTest {
 
 	}*/
 	
-	@Test
+	/*@Test
 	public void testNbmTime() {
 		LOG.info("Starting InMemory indexed model test!");
 		final W2VNrmlMemModelNonIndxd memModel = Word2VecFactory.getNormalizedBinNonIndxdModel();
@@ -70,5 +73,32 @@ public class NormalizedInMemModelTest {
 
 		LOG.info("Average query time: " + (totTime / centroids.length) + " milliseconds");
 
+	}*/
+	
+	@Test
+	public void testNbmTime() {
+		LOG.info("Starting InMemory indexed model test!");
+		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
+		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
+		List<String> correctWords = NrmlzdMdlPrfmncTester.getCorrectWords(centroids, nbm);
+		LOG.info("Correct Words are :" + correctWords);
+		
+		long startTime, diff;
+		long totTime = 0;
+		List<String> wordSet = new ArrayList<>();
+		for (int i=0;i<centroids.length;i++) {
+			LOG.info("Sending query for Centroid " + (i+1) );
+			startTime = System.currentTimeMillis();
+			Map<String, float[]> closestWordMap = nbm.getClosestEntry( centroids[i]);
+			diff = System.currentTimeMillis() - startTime;
+			totTime += diff;
+			wordSet.addAll(closestWordMap.keySet());
+			LOG.info("Query time recorded for Centroid " + (i+1) + " is "
+					+ diff + " milliseconds.");
+		}
+
+		LOG.info("Average query time: " + (totTime / centroids.length) + " milliseconds");
+		float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, wordSet);
+		LOG.info("Score for the Test is " + percVal + "%");
 	}
 }
