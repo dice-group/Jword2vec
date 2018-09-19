@@ -33,6 +33,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
+
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
@@ -70,7 +71,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	}
 
 	private int getBucketIndex(double cosineSimVal) {
-		Double dIndx = ((bucketCount-1d) / 2d) * (cosineSimVal + 1d);
+		Double dIndx = ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d);
 		return Math.round(dIndx.floatValue());
 	}
 
@@ -178,11 +179,11 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				BitSet curBs = new BitSet(word2vec.size());
 				curBs.or(csBucketContainer[i][indx]);
 				int temIndx = indx + 1;
-				if (temIndx < csBucketContainer[i].length) {
+				if (temIndx < csBucketContainer[i].length && csBucketContainer[i][temIndx] != null) {
 					curBs.or(csBucketContainer[i][temIndx]);
 				}
 				temIndx = indx - 1;
-				if (temIndx > -1) {
+				if (temIndx > -1 && csBucketContainer[i][temIndx] != null) {
 					curBs.or(csBucketContainer[i][temIndx]);
 				}
 				if (i == 0) {
