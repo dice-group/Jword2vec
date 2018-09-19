@@ -9,7 +9,6 @@ import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelIndxdLR;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelIndxdLRMulti;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
@@ -44,7 +43,7 @@ public class NrmlzdMdlPrfmncTester {
 		int scrSize = Math.round((kEnd - kStrt + 1) * (sigEnd - sigStrt + 1) * (arDivEnd - arDivStrt + 1));
 		float[] percScore = new float[scrSize];
 		int[] idArr = new int[percScore.length];
-		final W2VNrmlMemModelIndxdLRMulti memModel = new W2VNrmlMemModelIndxdLRMulti(nbm.word2vec, nbm.vectorSize);
+		final W2VNrmlMemModelIndxdLR memModel = new W2VNrmlMemModelIndxdLR(nbm.word2vec, nbm.vectorSize);
 		for (int a = kStrt; a <= kEnd; a+=100) {
 			for (float b = arDivStrt; b <= arDivEnd; b++) {
 				for (float c = sigStrt; c <= sigEnd; c++) {
