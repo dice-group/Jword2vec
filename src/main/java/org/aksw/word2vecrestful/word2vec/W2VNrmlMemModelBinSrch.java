@@ -28,8 +28,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private float[][] vecArr;
 	private int[] indxArr;
 	private double[] simValArr;
-	private int compareVecCount = 2;
-	private int bucketCount = 30;
+	private int compareVecCount = 10;
+	private int bucketCount = 15;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
