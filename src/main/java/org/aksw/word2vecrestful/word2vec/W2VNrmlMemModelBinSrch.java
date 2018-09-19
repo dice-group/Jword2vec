@@ -9,6 +9,8 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
+import nikit.test.TimeLogger;
+
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform
  * search on the model
@@ -29,7 +31,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private int compareVecCount = 4;
 	private int bucketCount = 10;
 	private BitSet[][] csBucketContainer;
-
+	// TODO : Remove this
+	private TimeLogger tl = new TimeLogger();
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
@@ -167,6 +170,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			// calculate cosine similarity of all distances
 			float[] curCompVec;
 			BitSet finBitSet = null;
+			tl.logTime(1);
 			for (int i = 0; i < compareVecCount; i++) {
 				curCompVec = comparisonVecs[i];
 				double cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(curCompVec, vector);
@@ -187,6 +191,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					finBitSet.and(curBs);
 				}
 			}
+			tl.printTime(1, "Setting Bits");
+			tl.logTime(1);
 			Map<String, float[]> nearbyVecs = new HashMap<>();
 			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
 				// operate on index i here
@@ -195,9 +201,12 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					break; // or (i+1) would overflow
 				}
 			}
+			tl.printTime(1, "Extracting words");
+			tl.logTime(1);
 			closestVec = Word2VecMath.findClosestNormalizedVec(nearbyVecs, vector);
+			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
-			LOG.error(e.getStackTrace());
+			e.printStackTrace();
 		}
 		return closestVec;
 	}
