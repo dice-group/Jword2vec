@@ -98,7 +98,7 @@ public class NrmlzdMdlPrfmncTester {
 		return wordSet;
 	}
 
-	public List<String> getCorrectWords(float[][] centroids, Word2VecModel nbm) {
+	public static List<String> getCorrectWords(float[][] centroids, Word2VecModel nbm) {
 		List<String> wordSet = new ArrayList<>();
 		W2VNrmlMemModelBruteForce bruteForce = new W2VNrmlMemModelBruteForce(nbm.word2vec, nbm.vectorSize);
 		long startTime, diff;
