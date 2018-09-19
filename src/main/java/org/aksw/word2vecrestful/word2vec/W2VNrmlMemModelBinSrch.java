@@ -67,7 +67,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	}
 
 	private int getBucketIndex(double cosineSimVal) {
-		Double dIndx = (bucketCount / 2) * cosineSimVal;
+		Double dIndx = ((bucketCount-1d) / 2d) * (cosineSimVal + 1d);
 		return Math.round(dIndx.floatValue());
 	}
 
