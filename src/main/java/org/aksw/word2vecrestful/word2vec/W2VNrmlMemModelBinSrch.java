@@ -1,7 +1,6 @@
 package org.aksw.word2vecrestful.word2vec;
 
 import java.util.BitSet;
-import java.util.HashMap;
 import java.util.Map;
 
 import org.aksw.word2vecrestful.utils.Word2VecMath;
@@ -194,17 +193,18 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			}
 			tl.printTime(1, "Setting Bits");
 			tl.logTime(1);
-			Map<String, float[]> nearbyVecs = new HashMap<>();
-			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1)) {
+			int[] nearbyIndexes = new int[finBitSet.cardinality()];
+			int j = 0;
+			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
 				// operate on index i here
-				nearbyVecs.put(wordArr[i], vecArr[i]);
+				nearbyIndexes[j] = i;
 				if (i == Integer.MAX_VALUE) {
 					break; // or (i+1) would overflow
 				}
 			}
 			tl.printTime(1, "Extracting words");
 			tl.logTime(1);
-			closestWord = findClosestWord(nearbyVecs, vector);
+			closestWord = findClosestWord(nearbyIndexes, vector);
 			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -212,16 +212,15 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		return closestWord;
 	}
 
-	private String findClosestWord(Map<String, float[]> nearbyVecs, float[] vector) {
+	private String findClosestWord(int[] nearbyIndexes, float[] vector) {
 		double minDist = -2;
 		String minWord = null;
 		double tempDist;
-		// Loop on the subset
-		for (String word : nearbyVecs.keySet()) {
-			float[] wordvec = word2vec.get(word);
+		for (int indx : nearbyIndexes) {
+			float[] wordvec = vecArr[indx];
 			tempDist = getSqEucDist(vector, wordvec, minDist);
 			if (tempDist != -1) {
-				minWord = word;
+				minWord = wordArr[indx];
 				minDist = tempDist;
 			}
 		}
