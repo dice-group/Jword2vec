@@ -28,7 +28,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private float[][] vecArr;
 	private int[] indxArr;
 	private double[] simValArr;
-	private int compareVecCount = 150;
+	private int compareVecCount = 100;
 	private int bucketCount = 10;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
@@ -164,7 +164,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 * @return closest word to the given vector alongwith it's vector
 	 */
 	private String getClosestEntry(float[] vector, String subKey) {
-		String closestVec = null;
+		String closestWord = null;
 		try {
 			// Normalize incoming vector
 			vector = Word2VecMath.normalize(vector);
@@ -204,12 +204,50 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			}
 			tl.printTime(1, "Extracting words");
 			tl.logTime(1);
-			closestVec = Word2VecMath.findClosestNormalizedVec(nearbyVecs, vector);
+			closestWord = findClosestWord(nearbyVecs, vector);
 			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return closestVec;
+		return closestWord;
+	}
+
+	private String findClosestWord(Map<String, float[]> nearbyVecs, float[] vector) {
+		double minDist = -2;
+		String minWord = null;
+		double tempDist;
+		// Loop on the subset
+		for (String word : nearbyVecs.keySet()) {
+			float[] wordvec = word2vec.get(word);
+			tempDist = getSqEucDist(vector, wordvec, minDist);
+			if (tempDist != -1) {
+				minWord = word;
+				minDist = tempDist;
+			}
+		}
+		return minWord;
+	}
+
+	/**
+	 * Method to find the squared value of euclidean distance between two vectors if
+	 * it is less than the provided minimum distance value, otherwise return -1
+	 * 
+	 * @param arr1
+	 *            - first vector
+	 * @param arr2
+	 *            - second vector
+	 * @param minDist
+	 *            - minimum distance constraint
+	 * @return squared euclidean distance between two vector or -1
+	 */
+	private double getSqEucDist(float[] arr1, float[] arr2, double minDist) {
+		double dist = 0;
+		for (int i = 0; i < vectorSize; i++) {
+			dist += Math.pow(arr1[i] - arr2[i], 2);
+			if (minDist != -2 && dist > minDist)
+				return -1;
+		}
+		return dist;
 	}
 
 	/**
