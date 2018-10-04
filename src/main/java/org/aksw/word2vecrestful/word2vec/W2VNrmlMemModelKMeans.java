@@ -49,7 +49,7 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	}
 
 	private void generateComparisonVectors() {
-		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount);
+		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount, 10);
 		List<ClusterableVec> vecList = new ArrayList<>();
 		for (float[] vec : word2vec.values()) {
 			vecList.add(getClusterablePoint(vec));
