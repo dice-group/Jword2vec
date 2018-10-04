@@ -41,8 +41,10 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 		this.vectorSize = vectorSize;
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
+		LOG.info("Starting Generation of comparison vectors!");
 		// Fetch comparison vectors
 		generateComparisonVectors();
+		LOG.info("Comparison vectors generated. Building buckets.");
 		// Initialize Arrays
 		processCosineSim();
 
