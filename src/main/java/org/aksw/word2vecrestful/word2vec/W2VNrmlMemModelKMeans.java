@@ -30,8 +30,9 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	private float[][] comparisonVecs = null;
 	private String[] wordArr;
 	private float[][] vecArr;
-	private int compareVecCount = 100;
+	private int compareVecCount = 10;
 	private int bucketCount = 10;
+	private int kMeansMaxItr = 10;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
@@ -51,7 +52,7 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	}
 
 	private void generateComparisonVectors() {
-		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount, 10);
+		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount, kMeansMaxItr);
 		List<ClusterableVec> vecList = new ArrayList<>();
 		for (float[] vec : word2vec.values()) {
 			vecList.add(getClusterablePoint(vec));
