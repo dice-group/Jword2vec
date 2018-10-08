@@ -30,9 +30,9 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	private float[][] comparisonVecs = null;
 	private String[] wordArr;
 	private float[][] vecArr;
-	private int compareVecCount = 10;
+	private int compareVecCount = 150;
 	private int bucketCount = 10;
-	private int kMeansMaxItr = 10;
+	private int kMeansMaxItr = 5;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
