@@ -1,5 +1,9 @@
 package org.aksw.word2vecrestful.word2vec;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -12,6 +16,9 @@ import org.apache.commons.math3.ml.clustering.Clusterable;
 import org.apache.commons.math3.ml.clustering.KMeansPlusPlusClusterer;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+
+import com.opencsv.CSVReader;
+import com.opencsv.CSVWriter;
 
 import nikit.test.TimeLogger;
 
@@ -30,29 +37,44 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	private float[][] comparisonVecs = null;
 	private String[] wordArr;
 	private float[][] vecArr;
-	private int compareVecCount = 150;
+	private int compareVecCount = 100;
 	private int bucketCount = 10;
-	private int kMeansMaxItr = 5;
+	private int kMeansMaxItr = 10;
 	private BitSet[][] csBucketContainer;
+	private String vecFilePath = "data/kmeans/comparison-vecs.csv";
 	// TODO : Remove this
 	private TimeLogger tl = new TimeLogger();
 
-	public W2VNrmlMemModelKMeans(final Map<String, float[]> word2vec, final int vectorSize) {
+	public W2VNrmlMemModelKMeans(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
-		LOG.info("Starting Generation of comparison vectors!");
-		// Fetch comparison vectors
-		generateComparisonVectors();
-		LOG.info("Comparison vectors generated. Building buckets.");
+		fetchComparisonVectors();
 		// Initialize Arrays
 		processCosineSim();
+	}
 
+	private void fetchComparisonVectors() throws IOException {
+		File vecFile = new File(vecFilePath);
+		if (vecFile.exists()) {
+			LOG.info("Reading Comparsion vectors from the file.");
+			// read the persisted vectors
+			comparisonVecs = readVecsFromFile(vecFile);
+		} else {
+			LOG.info("Starting Generation of comparison vectors!");
+			// Fetch comparison vectors
+			generateComparisonVectors();
+			// persist the generated vectors
+
+			writeVecsToFile(comparisonVecs, vecFile);
+		}
+		LOG.info("Comparison vectors generated/fetched. Building buckets.");
 	}
 
 	private void generateComparisonVectors() {
-		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount, kMeansMaxItr);
+		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount,
+				kMeansMaxItr);
 		List<ClusterableVec> vecList = new ArrayList<>();
 		for (float[] vec : word2vec.values()) {
 			vecList.add(getClusterablePoint(vec));
@@ -61,6 +83,7 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 		int i = 0;
 		for (CentroidCluster<ClusterableVec> entry : compVecList) {
 			Clusterable centroid = entry.getCenter();
+			LOG.info("Number of points in the cluster " + (i + 1) + " are: " + entry.getPoints().size());
 			float[] fCentroid = Word2VecMath.convertDoublesToFloats(centroid.getPoint());
 			comparisonVecs[i] = fCentroid;
 			i++;
@@ -248,6 +271,71 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	 */
 	public Map<String, float[]> getWord2VecMap() {
 		return this.word2vec;
+	}
+
+	public static float[][] readVecsFromFile(File inputFile) throws IOException {
+		float[][] vecArr = null;
+		FileReader fileReader;
+		CSVReader reader = null;
+		try {
+			fileReader = new FileReader(inputFile);
+			reader = new CSVReader(fileReader);
+			List<String[]> vecList = reader.readAll();
+			vecArr = new float[vecList.size()][vecList.get(0).length];
+			for (int i = 0; i < vecList.size(); i++) {
+				vecArr[i] = convertToFloatArr(vecList.get(i));
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (reader != null) {
+				// closing writer connection
+				reader.close();
+			}
+		}
+		return vecArr;
+	}
+
+	public static void writeVecsToFile(float[][] vecArr, File outputFile) throws IOException {
+		outputFile.getParentFile().mkdirs();
+		CSVWriter writer = null;
+		try {
+			// create FileWriter object with file as parameter
+			FileWriter fileWriter = new FileWriter(outputFile);
+
+			// create CSVWriter object filewriter object as parameter
+			writer = new CSVWriter(fileWriter);
+			for (int i = 0; i < vecArr.length; i++) {
+				float[] vec = vecArr[i];
+				String[] line = convertToStrArr(vec);
+				writer.writeNext(line);
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (writer != null) {
+				// closing writer connection
+				writer.close();
+			}
+		}
+	}
+
+	public static String[] convertToStrArr(float[] vec) {
+		String[] resArr = new String[vec.length];
+		for (int i = 0; i < resArr.length; i++) {
+			resArr[i] = String.valueOf(vec[i]);
+		}
+		return resArr;
+	}
+
+	public static float[] convertToFloatArr(String[] vec) {
+		float[] resArr = new float[vec.length];
+		for (int i = 0; i < resArr.length; i++) {
+			resArr[i] = Float.parseFloat(vec[i]);
+		}
+		return resArr;
 	}
 
 }

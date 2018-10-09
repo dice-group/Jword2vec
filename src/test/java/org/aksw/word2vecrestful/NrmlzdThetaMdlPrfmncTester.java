@@ -1,5 +1,6 @@
 package org.aksw.word2vecrestful;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 	 */
 
 	@Test
-	public void testNbmTime() {
+	public void testNbmTime() throws IOException {
 		long startTime, diff;
 		long totTime = 0;
 		LOG.info("Starting InMemory Theta Model test!");
