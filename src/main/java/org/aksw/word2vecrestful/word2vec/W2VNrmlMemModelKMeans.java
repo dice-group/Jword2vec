@@ -39,7 +39,7 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 	private float[][] vecArr;
 	private int compareVecCount = 100;
 	private int bucketCount = 10;
-	private int kMeansMaxItr = 10;
+	private int kMeansMaxItr = 5;
 	private BitSet[][] csBucketContainer;
 	private String vecFilePath = "data/kmeans/comparison-vecs.csv";
 	// TODO : Remove this
