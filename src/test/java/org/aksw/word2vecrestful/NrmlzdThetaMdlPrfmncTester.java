@@ -56,7 +56,10 @@ public class NrmlzdThetaMdlPrfmncTester {
 		long totTime = 0;
 		LOG.info("Starting InMemory Theta Model test!");
 		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
-		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5 };
+		float[][] centroids = { TestConst.CENT1, TestConst.CENT2, TestConst.CENT3, TestConst.CENT4, TestConst.CENT5,
+				TestConst.CENT6, TestConst.CENT7, TestConst.CENT8, TestConst.CENT9, TestConst.CENT10, TestConst.CENT11,
+				TestConst.CENT12, TestConst.CENT13, TestConst.CENT14, TestConst.CENT15, TestConst.CENT16,
+				TestConst.CENT17, TestConst.CENT18, TestConst.CENT19, TestConst.CENT20 };
 		LOG.info("Starting BruteForce-Model Test");
 		List<String> correctWords = NrmlzdMdlPrfmncTester.getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
@@ -74,8 +77,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 			totTime += diff;
 			LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
 		}
-		LOG.info(
-				"Average query time for W2VNrmlMemModelKMeans is : " + (totTime / centroids.length) + " milliseconds");
+		LOG.info("Average query time for W2VNrmlMemModelKMeans is : " + (totTime / centroids.length) + " milliseconds");
 		LOG.info("Predicted Words are :" + lrModelWords);
 		float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, lrModelWords);
 		LOG.info("Score for Test is : " + percVal + "%");
