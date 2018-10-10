@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.aksw.word2vecrestful.utils.Cfg;
+import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelKMeans;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
@@ -81,12 +82,18 @@ public class NrmlzdThetaMdlPrfmncTester {
 			totTime += diff;
 			LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
 		}
-		LOG.info(
-				"Average query time for W2VNrmlMemModelKMeans is : " + (totTime / centroids.length) + " milliseconds");
+		LOG.info("Average query time for W2VNrmlMemModelKMeans is : " + (totTime / centroids.length) + " milliseconds");
 		LOG.info("Predicted Words are :" + lrModelWords);
 		float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, lrModelWords);
 		LOG.info("Score for Test is : " + percVal + "%");
 		lrModelWords.clear();
+
+		String word1 = "By_Jonas_Elmerraji";
+		String word2 = "%_#F########_3v.jsn";
+		float[] word1Vec = nbm.word2vec.get("By_Jonas_Elmerraji");
+		float[] word2Vec = nbm.word2vec.get("%_#F########_3v.jsn");
+		LOG.info("Cosine Similarity between " + word1 + " & " + word2 + " is : "
+				+ Word2VecMath.cosineSimilarity(word1Vec, word2Vec));
 	}
 
 	private static float[][] fetchWordsVec(String[] words, Word2VecModel nbm) {

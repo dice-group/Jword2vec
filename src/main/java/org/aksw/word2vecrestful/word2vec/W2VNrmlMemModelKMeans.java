@@ -198,7 +198,9 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 			}
 			tl.printTime(1, "Setting Bits");
 			tl.logTime(1);
-			int[] nearbyIndexes = new int[finBitSet.cardinality()];
+			int nearbyWordsCount = finBitSet.cardinality();
+			LOG.info("Number of nearby words: "+nearbyWordsCount);
+			int[] nearbyIndexes = new int[nearbyWordsCount];
 			int j = 0;
 			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
 				// operate on index i here
