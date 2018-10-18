@@ -8,11 +8,17 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
-import nikit.test.TimeLogger;
-
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform
- * search on the model
+ * search on the model.
+ * 
+ * This class selects {@link W2VNrmlMemModelBinSrch#compareVecCount} vectors (1
+ * mean vector and others on basis Map iterator) and then calculates the cosine
+ * similarity of all words in model to those vectors.
+ * 
+ * It uses the knowledge about pre-processed similarities with
+ * {@link W2VNrmlMemModelBinSrch#comparisonVecs} to narrow down the search of
+ * closest word for the user specified vector.
  * 
  * @author Nikit
  *
@@ -30,8 +36,6 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private int compareVecCount = 150;
 	private int bucketCount = 10;
 	private BitSet[][] csBucketContainer;
-	// TODO : Remove this
-	private TimeLogger tl = new TimeLogger();
 
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) {
 		this.word2vec = word2vec;
@@ -170,13 +174,12 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			// calculate cosine similarity of all distances
 			float[] curCompVec;
 			BitSet finBitSet = null;
-			tl.logTime(1);
 			for (int i = 0; i < compareVecCount; i++) {
 				curCompVec = comparisonVecs[i];
 				double cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(curCompVec, vector);
 				int indx = getBucketIndex(cosSimVal);
 				BitSet curBs = new BitSet(word2vec.size());
-				if(csBucketContainer[i][indx]!=null) {
+				if (csBucketContainer[i][indx] != null) {
 					curBs.or(csBucketContainer[i][indx]);
 				}
 				int temIndx = indx + 1;
@@ -193,10 +196,8 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					finBitSet.and(curBs);
 				}
 			}
-			tl.printTime(1, "Setting Bits");
-			tl.logTime(1);
 			int nearbyWordsCount = finBitSet.cardinality();
-			LOG.info("Number of nearby words: "+nearbyWordsCount);
+			//LOG.info("Number of nearby words: " + nearbyWordsCount);
 			int[] nearbyIndexes = new int[nearbyWordsCount];
 			int j = 0;
 			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
@@ -206,15 +207,12 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 					break; // or (i+1) would overflow
 				}
 			}
-			tl.printTime(1, "Extracting words");
-			tl.logTime(1);
 			closestWord = findClosestWord(nearbyIndexes, vector);
-			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
 			LOG.error("Exception has occured while finding closest word.");
 			e.printStackTrace();
 		}
-		LOG.info("Closest word found is: "+closestWord);
+		//LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
 

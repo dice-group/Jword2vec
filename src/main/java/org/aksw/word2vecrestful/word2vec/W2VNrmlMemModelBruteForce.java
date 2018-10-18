@@ -6,12 +6,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.aksw.word2vecrestful.subset.DataSubsetProvider;
+import org.aksw.word2vecrestful.utils.TimeLogger;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
-
-import nikit.test.TimeLogger;
 
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform

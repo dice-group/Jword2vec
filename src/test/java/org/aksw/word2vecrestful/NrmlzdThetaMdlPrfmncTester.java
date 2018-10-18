@@ -14,8 +14,6 @@ import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 import org.junit.Test;
 
-import nikit.test.TestConst;
-
 public class NrmlzdThetaMdlPrfmncTester {
 	static {
 		PropertyConfigurator.configure(Cfg.LOG_FILE);

@@ -1,4 +1,4 @@
-package nikit.test;
+package org.aksw.word2vecrestful;
 
 import java.util.HashMap;
 import java.util.Map;
