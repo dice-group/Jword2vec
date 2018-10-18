@@ -87,17 +87,6 @@ public class NrmlzdThetaMdlPrfmncTester {
 		float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, lrModelWords);
 		LOG.info("Score for Test is : " + percVal + "%");
 		lrModelWords.clear();
-
-		String word1 = "By_Jonas_Elmerraji";
-		String word2 = "%_#F########_3v.jsn";
-		float[] word1Vec = nbm.word2vec.get("By_Jonas_Elmerraji");
-		float[] word2Vec = nbm.word2vec.get("%_#F########_3v.jsn");
-		LOG.info("Cosine Similarity between " + word1 + " & " + word2 + " is : "
-				+ Word2VecMath.cosineSimilarity(word1Vec, word2Vec));
-		LOG.info("Cosine Similarity between " + word1 + " & Centroid19 is : "
-				+ Word2VecMath.cosineSimilarity(TestConst.CENT19, word1Vec));
-		LOG.info("Cosine Similarity between " + word2 + " & Centroid19 is : "
-				+ Word2VecMath.cosineSimilarity(TestConst.CENT19, word2Vec));
 	}
 
 	private static float[][] fetchWordsVec(String[] words, Word2VecModel nbm) {
