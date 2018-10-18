@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelKMeans;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBinSrch;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
@@ -68,11 +68,11 @@ public class NrmlzdThetaMdlPrfmncTester {
 		LOG.info("Starting BruteForce-Model Test");
 		List<String> correctWords = NrmlzdMdlPrfmncTester.getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
-		LOG.info("Initializing W2VNrmlMemModelKMeans Model");
-		final W2VNrmlMemModelKMeans memModel = new W2VNrmlMemModelKMeans(nbm.word2vec, nbm.vectorSize);
+		LOG.info("Initializing W2VNrmlMemModelBinSrch Model");
+		final W2VNrmlMemModelBinSrch memModel = new W2VNrmlMemModelBinSrch(nbm.word2vec, nbm.vectorSize);
 		List<String> lrModelWords = new ArrayList<>();
 
-		LOG.info("Starting W2VNrmlMemModelKMeans Test");
+		LOG.info("Starting W2VNrmlMemModelBinSrch Test");
 
 		for (int i = 0; i < centroids.length; i++) {
 			LOG.info("Sending query for Centroid " + (i + 1));
@@ -82,7 +82,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 			totTime += diff;
 			LOG.info("Query time recorded for Centroid " + (i + 1) + " is " + diff + " milliseconds.");
 		}
-		LOG.info("Average query time for W2VNrmlMemModelKMeans is : " + (totTime / centroids.length) + " milliseconds");
+		LOG.info("Average query time for W2VNrmlMemModelBinSrch is : " + (totTime / centroids.length) + " milliseconds");
 		LOG.info("Predicted Words are :" + lrModelWords);
 		float percVal = NrmlzdMdlPrfmncTester.calcPercScore(correctWords, lrModelWords);
 		LOG.info("Score for Test is : " + percVal + "%");
