@@ -63,8 +63,8 @@ public class NrmlzdThetaMdlPrfmncTester {
 		long totTime = 0;
 		LOG.info("Starting InMemory Theta Model test!");
 		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
-		// float[][] centroids = TEST_CENTROIDS;
-		float[][] centroids = fetchWordsVec(TEST_WORDS, nbm);
+		float[][] centroids = TEST_CENTROIDS;
+		//float[][] centroids = fetchWordsVec(TEST_WORDS, nbm);
 		LOG.info("Starting BruteForce-Model Test");
 		List<String> correctWords = NrmlzdMdlPrfmncTester.getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
