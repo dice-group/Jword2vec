@@ -181,7 +181,10 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 				double cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(curCompVec, vector);
 				int indx = getBucketIndex(cosSimVal);
 				BitSet curBs = new BitSet(word2vec.size());
-				curBs.or(csBucketContainer[i][indx]);
+				BitSet tempBs = csBucketContainer[i][indx];
+				if(tempBs!=null) {
+					curBs.or(tempBs);
+				}
 				int temIndx = indx + 1;
 				if (temIndx < csBucketContainer[i].length && csBucketContainer[i][temIndx] != null) {
 					curBs.or(csBucketContainer[i][temIndx]);
