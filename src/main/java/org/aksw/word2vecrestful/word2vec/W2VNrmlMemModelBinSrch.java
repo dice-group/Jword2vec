@@ -38,6 +38,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	protected int bucketCount = 10;
 	protected BitSet[][] csBucketContainer;
 
+	protected W2VNrmlMemModelBinSrch() {
+	}
+
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;

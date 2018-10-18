@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.List;
 import java.util.Map;
 
+import org.aksw.word2vecrestful.utils.Cfg;
 import org.aksw.word2vecrestful.utils.ClusterableVec;
 import org.aksw.word2vecrestful.utils.Word2VecMath;
 import org.apache.commons.math3.ml.clustering.CentroidCluster;
@@ -38,8 +39,8 @@ import com.opencsv.CSVWriter;
 public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
-	protected int kMeansMaxItr = 5;
-	protected String vecFilePath = "data/kmeans/comparison-vecs.csv";
+	private static final int KMEANS_MAX_ITR = 5;
+	private static final String VEC_FILEPATH = Cfg.get(W2VNrmlMemModelKMeans.class.getName().concat(".filepath"));
 
 	public W2VNrmlMemModelKMeans(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		super(word2vec, vectorSize);
@@ -54,7 +55,7 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 	}
 
 	private void fetchComparisonVectors() throws IOException {
-		File vecFile = new File(vecFilePath);
+		File vecFile = new File(VEC_FILEPATH);
 		if (vecFile.exists()) {
 			LOG.info("Reading Comparsion vectors from the file.");
 			// read the persisted vectors
@@ -72,7 +73,7 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 
 	private void generateComparisonVectors() {
 		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount,
-				kMeansMaxItr);
+				KMEANS_MAX_ITR);
 		List<ClusterableVec> vecList = new ArrayList<>();
 		for (float[] vec : word2vec.values()) {
 			vecList.add(getClusterablePoint(vec));
