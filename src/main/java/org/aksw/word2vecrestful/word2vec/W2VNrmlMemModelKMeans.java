@@ -214,8 +214,10 @@ public class W2VNrmlMemModelKMeans implements GenWord2VecModel {
 			closestWord = findClosestWord(nearbyIndexes, vector);
 			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
+			LOG.error("Exception has occured while finding closest word.");
 			e.printStackTrace();
 		}
+		LOG.info("Closest word found is: "+closestWord);
 		return closestWord;
 	}
 
