@@ -27,7 +27,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	private float[][] vecArr;
 	private int[] indxArr;
 	private double[] simValArr;
-	private int compareVecCount = 100;
+	private int compareVecCount = 150;
 	private int bucketCount = 10;
 	private BitSet[][] csBucketContainer;
 	// TODO : Remove this
@@ -176,7 +176,9 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				double cosSimVal = Word2VecMath.cosineSimilarityNormalizedVecs(curCompVec, vector);
 				int indx = getBucketIndex(cosSimVal);
 				BitSet curBs = new BitSet(word2vec.size());
-				curBs.or(csBucketContainer[i][indx]);
+				if(csBucketContainer[i][indx]!=null) {
+					curBs.or(csBucketContainer[i][indx]);
+				}
 				int temIndx = indx + 1;
 				if (temIndx < csBucketContainer[i].length && csBucketContainer[i][temIndx] != null) {
 					curBs.or(csBucketContainer[i][temIndx]);
@@ -209,8 +211,10 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			closestWord = findClosestWord(nearbyIndexes, vector);
 			tl.printTime(1, "finding closest word");
 		} catch (Exception e) {
+			LOG.error("Exception has occured while finding closest word.");
 			e.printStackTrace();
 		}
+		LOG.info("Closest word found is: "+closestWord);
 		return closestWord;
 	}
 
