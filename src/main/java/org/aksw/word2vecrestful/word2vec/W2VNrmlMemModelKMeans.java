@@ -38,8 +38,8 @@ import com.opencsv.CSVWriter;
 public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
-	private int kMeansMaxItr = 5;
-	private String vecFilePath = "data/kmeans/comparison-vecs.csv";
+	protected int kMeansMaxItr = 5;
+	protected String vecFilePath = "data/kmeans/comparison-vecs.csv";
 
 	public W2VNrmlMemModelKMeans(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		super(word2vec, vectorSize);
