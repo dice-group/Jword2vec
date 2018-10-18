@@ -1,5 +1,6 @@
 package org.aksw.word2vecrestful.word2vec;
 
+import java.io.IOException;
 import java.util.BitSet;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 
 /**
  * Class to encapsulate word2vec in-memory model and expose methods to perform
- * search on the model.
+ * search on the model. (Only works with Normalized Model)
  * 
  * This class selects {@link W2VNrmlMemModelBinSrch#compareVecCount} vectors (1
  * mean vector and others on basis Map iterator) and then calculates the cosine
@@ -26,29 +27,33 @@ import org.dice_research.topicmodeling.commons.sort.AssociativeSort;
 public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
-	private Map<String, float[]> word2vec;
-	private int vectorSize;
-	private float[][] comparisonVecs = null;
-	private String[] wordArr;
-	private float[][] vecArr;
-	private int[] indxArr;
-	private double[] simValArr;
-	private int compareVecCount = 150;
-	private int bucketCount = 10;
-	private BitSet[][] csBucketContainer;
+	protected Map<String, float[]> word2vec;
+	protected int vectorSize;
+	protected float[][] comparisonVecs = null;
+	protected String[] wordArr;
+	protected float[][] vecArr;
+	protected int[] indxArr;
+	protected double[] simValArr;
+	protected int compareVecCount = 150;
+	protected int bucketCount = 10;
+	protected BitSet[][] csBucketContainer;
 
-	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) {
+	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
+		process();
+	}
+
+	protected void process() throws IOException {
+		LOG.info("Process from BinSrch called");
 		// Setting mean as comparison vec
 		setMeanComparisonVec(word2vec, vectorSize);
 		// Initialize Arrays
 		processCosineSim();
 		// Set other comparison vecs
 		setAllComparisonVecs();
-
 	}
 
 	private void setBucketVals(int compVecIndex, float[] comparisonVec) {
@@ -73,7 +78,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		}
 	}
 
-	private int getBucketIndex(double cosineSimVal) {
+	protected int getBucketIndex(double cosineSimVal) {
 		Double dIndx = ((bucketCount - 1d) / 2d) * (cosineSimVal + 1d);
 		return Math.round(dIndx.floatValue());
 	}
@@ -98,7 +103,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 		AssociativeSort.quickSort(simValArr, indxArr);
 	}
 
-	private void setValToBucket(int wordIndex, double cosSimVal, BitSet[] meanComparisonVecBuckets) {
+	protected void setValToBucket(int wordIndex, double cosSimVal, BitSet[] meanComparisonVecBuckets) {
 		int bucketIndex = getBucketIndex(cosSimVal);
 		BitSet bitset = meanComparisonVecBuckets[bucketIndex];
 		if (bitset == null) {
@@ -166,7 +171,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 *            - key to subset if any
 	 * @return closest word to the given vector alongwith it's vector
 	 */
-	private String getClosestEntry(float[] vector, String subKey) {
+	protected String getClosestEntry(float[] vector, String subKey) {
 		String closestWord = null;
 		try {
 			// Normalize incoming vector
@@ -197,7 +202,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 				}
 			}
 			int nearbyWordsCount = finBitSet.cardinality();
-			//LOG.info("Number of nearby words: " + nearbyWordsCount);
+			// LOG.info("Number of nearby words: " + nearbyWordsCount);
 			int[] nearbyIndexes = new int[nearbyWordsCount];
 			int j = 0;
 			for (int i = finBitSet.nextSetBit(0); i >= 0; i = finBitSet.nextSetBit(i + 1), j++) {
@@ -212,11 +217,11 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 			LOG.error("Exception has occured while finding closest word.");
 			e.printStackTrace();
 		}
-		//LOG.info("Closest word found is: " + closestWord);
+		// LOG.info("Closest word found is: " + closestWord);
 		return closestWord;
 	}
 
-	private String findClosestWord(int[] nearbyIndexes, float[] vector) {
+	protected String findClosestWord(int[] nearbyIndexes, float[] vector) {
 		double minDist = -2;
 		String minWord = null;
 		double tempDist;
@@ -243,7 +248,7 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 *            - minimum distance constraint
 	 * @return squared euclidean distance between two vector or -1
 	 */
-	private double getSqEucDist(float[] arr1, float[] arr2, double minDist) {
+	protected double getSqEucDist(float[] arr1, float[] arr2, double minDist) {
 		double dist = 0;
 		for (int i = 0; i < vectorSize; i++) {
 			dist += Math.pow(arr1[i] - arr2[i], 2);
