@@ -9,8 +9,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelNonIndxd;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
+import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
@@ -87,7 +87,7 @@ public class ModelStatsWriter {
 	 */
 	public static void main(String[] args) throws JsonProcessingException, FileNotFoundException, IOException {
 		// Get the normalized model
-		W2VNrmlMemModelNonIndxd model = Word2VecFactory.getNormalizedBinNonIndxdModel();
-		writeModelStats(model.getWord2VecMap(), model.getVectorSize(), new File("data/normal/stat/normal-model-stats.csv"));
+		Word2VecModel model = Word2VecFactory.getNormalBinModel();
+		writeModelStats(model.word2vec, model.vectorSize, new File("data/normal/stat/normal-model-stats.csv"));
 	}
 }
