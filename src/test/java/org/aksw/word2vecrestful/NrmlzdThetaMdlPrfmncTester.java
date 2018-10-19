@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.aksw.word2vecrestful.utils.Cfg;
-import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
+import org.aksw.word2vecrestful.word2vec.GenWord2VecModel;
 import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBinSrch;
+import org.aksw.word2vecrestful.word2vec.W2VNrmlMemModelBruteForce;
 import org.aksw.word2vecrestful.word2vec.Word2VecFactory;
 import org.aksw.word2vecrestful.word2vec.Word2VecModel;
 import org.apache.log4j.LogManager;
@@ -39,7 +40,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
 		LOG.info("Initializing W2VNrmlMemModelBinSrch Model");
-		final W2VNrmlMemModelBinSrch memModel = new W2VNrmlMemModelBinSrch(nbm.word2vec, nbm.vectorSize);
+		final GenWord2VecModel memModel = new W2VNrmlMemModelBinSrch(nbm.word2vec, nbm.vectorSize);
 		memModel.process();
 		List<String> lrModelWords = new ArrayList<>();
 
