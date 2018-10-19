@@ -138,8 +138,8 @@ public class DataSubsetGenerator {
 	 * @throws IOException
 	 */
 	public static void main(String[] args) throws JsonProcessingException, FileNotFoundException, IOException {
-		File subsetConfig = new File(".\\word2vec-dump\\subsetconfig2.json");
-		Word2VecModel model = Word2VecFactory.get();
+		File subsetConfig = new File("word2vec-dump\\subsetconfig2.json");
+		Word2VecModel model = Word2VecFactory.getNormalBinModel();
 		generateSubsetFiles(subsetConfig, Cfg.get("org.aksw.word2vecrestful.Application.subsetfiledir"), model.word2vec,
 				model.vectorSize);
 	}
