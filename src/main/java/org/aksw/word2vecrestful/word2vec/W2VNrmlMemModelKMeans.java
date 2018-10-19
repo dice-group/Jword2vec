@@ -39,15 +39,15 @@ import com.opencsv.CSVWriter;
 public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 	public static Logger LOG = LogManager.getLogger(GenWord2VecModel.class);
 
-	private static final int KMEANS_MAX_ITR = 5;
-	private static final String VEC_FILEPATH = Cfg.get(W2VNrmlMemModelKMeans.class.getName().concat(".filepath"));
+	private int kMeansMaxItr = 5;
+	private String vecFilePath = Cfg.get(W2VNrmlMemModelKMeans.class.getName().concat(".filepath"));
 
 	public W2VNrmlMemModelKMeans(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		super(word2vec, vectorSize);
 	}
 
 	@Override
-	protected void process() throws IOException {
+	public void process() throws IOException {
 		LOG.info("Process from KMeans called");
 		fetchComparisonVectors();
 		// Initialize Arrays
@@ -55,7 +55,7 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 	}
 
 	private void fetchComparisonVectors() throws IOException {
-		File vecFile = new File(VEC_FILEPATH);
+		File vecFile = new File(vecFilePath);
 		if (vecFile.exists()) {
 			LOG.info("Reading Comparsion vectors from the file.");
 			// read the persisted vectors
@@ -73,7 +73,7 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 
 	private void generateComparisonVectors() {
 		KMeansPlusPlusClusterer<ClusterableVec> clusterer = new KMeansPlusPlusClusterer<>(compareVecCount,
-				KMEANS_MAX_ITR);
+				kMeansMaxItr);
 		List<ClusterableVec> vecList = new ArrayList<>();
 		for (float[] vec : word2vec.values()) {
 			vecList.add(getClusterablePoint(vec));
@@ -175,6 +175,23 @@ public class W2VNrmlMemModelKMeans extends W2VNrmlMemModelBinSrch {
 			resArr[i] = Float.parseFloat(vec[i]);
 		}
 		return resArr;
+	}
+
+	// Getter and Setters
+	public int getkMeansMaxItr() {
+		return kMeansMaxItr;
+	}
+
+	public void setkMeansMaxItr(int kMeansMaxItr) {
+		this.kMeansMaxItr = kMeansMaxItr;
+	}
+
+	public String getVecFilePath() {
+		return vecFilePath;
+	}
+
+	public void setVecFilePath(String vecFilePath) {
+		this.vecFilePath = vecFilePath;
 	}
 
 }

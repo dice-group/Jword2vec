@@ -44,12 +44,16 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	public W2VNrmlMemModelBinSrch(final Map<String, float[]> word2vec, final int vectorSize) throws IOException {
 		this.word2vec = word2vec;
 		this.vectorSize = vectorSize;
+		initVars();
+		// process();
+	}
+	
+	public void initVars() {
 		comparisonVecs = new float[compareVecCount][vectorSize];
 		csBucketContainer = new BitSet[compareVecCount][bucketCount];
-		process();
 	}
 
-	protected void process() throws IOException {
+	public void process() throws IOException {
 		LOG.info("Process from BinSrch called");
 		// Setting mean as comparison vec
 		setMeanComparisonVec(word2vec, vectorSize);
@@ -278,6 +282,22 @@ public class W2VNrmlMemModelBinSrch implements GenWord2VecModel {
 	 */
 	public Map<String, float[]> getWord2VecMap() {
 		return this.word2vec;
+	}
+
+	public int getCompareVecCount() {
+		return compareVecCount;
+	}
+
+	public void setCompareVecCount(int compareVecCount) {
+		this.compareVecCount = compareVecCount;
+	}
+
+	public int getBucketCount() {
+		return bucketCount;
+	}
+
+	public void setBucketCount(int bucketCount) {
+		this.bucketCount = bucketCount;
 	}
 
 }

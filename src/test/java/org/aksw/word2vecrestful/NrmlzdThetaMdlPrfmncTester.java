@@ -34,12 +34,13 @@ public class NrmlzdThetaMdlPrfmncTester {
 		LOG.info("Starting InMemory Theta Model test!");
 		Word2VecModel nbm = Word2VecFactory.getNormalBinModel();
 		float[][] centroids = TEST_CENTROIDS;
-		//float[][] centroids = fetchWordsVec(TEST_WORDS, nbm);
+		// float[][] centroids = fetchWordsVec(TEST_WORDS, nbm);
 		LOG.info("Starting BruteForce-Model Test");
 		List<String> correctWords = getCorrectWords(centroids, nbm);
 		LOG.info("Correct Words are :" + correctWords);
 		LOG.info("Initializing W2VNrmlMemModelKMeans Model");
 		final W2VNrmlMemModelKMeans memModel = new W2VNrmlMemModelKMeans(nbm.word2vec, nbm.vectorSize);
+		memModel.process();
 		List<String> lrModelWords = new ArrayList<>();
 
 		LOG.info("Starting W2VNrmlMemModelKMeans Test");
@@ -66,7 +67,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 		}
 		return resVec;
 	}
-	
+
 	public static float calcPercScore(List<String> correctWordSet, List<String> lrModelWords) {
 		float percScore = 0;
 		int len = correctWordSet.size();
@@ -79,7 +80,7 @@ public class NrmlzdThetaMdlPrfmncTester {
 		return percScore;
 
 	}
-	
+
 	public static List<String> getCorrectWords(float[][] centroids, Word2VecModel nbm) {
 		List<String> wordSet = new ArrayList<>();
 		W2VNrmlMemModelBruteForce bruteForce = new W2VNrmlMemModelBruteForce(nbm.word2vec, nbm.vectorSize);
